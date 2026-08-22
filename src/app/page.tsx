@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { supabase } from "@/lib/supabase";
 import type { Phone } from "@/types/database";
 
@@ -32,27 +34,29 @@ export default async function Home() {
         ) : phones && phones.length > 0 ? (
           <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {phones.map((phone) => (
-              <li
-                key={phone.id}
-                className="rounded-lg border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-900"
-              >
-                <h2 className="mb-2 text-lg font-medium text-zinc-900 dark:text-zinc-50">
-                  {phone.name}
-                </h2>
-                <dl className="space-y-1 text-sm text-zinc-600 dark:text-zinc-400">
-                  <div className="flex gap-2">
-                    <dt className="font-medium text-zinc-500 dark:text-zinc-500">
-                      メーカー
-                    </dt>
-                    <dd>{phone.maker}</dd>
-                  </div>
-                  <div className="flex gap-2">
-                    <dt className="font-medium text-zinc-500 dark:text-zinc-500">
-                      発売年
-                    </dt>
-                    <dd>{phone.released_year}年</dd>
-                  </div>
-                </dl>
+              <li key={phone.id}>
+                <Link
+                  href={`/phones/${phone.id}`}
+                  className="block rounded-lg border border-zinc-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900"
+                >
+                  <h2 className="mb-2 text-lg font-medium text-zinc-900 dark:text-zinc-50">
+                    {phone.name}
+                  </h2>
+                  <dl className="space-y-1 text-sm text-zinc-600 dark:text-zinc-400">
+                    <div className="flex gap-2">
+                      <dt className="font-medium text-zinc-500 dark:text-zinc-500">
+                        メーカー
+                      </dt>
+                      <dd>{phone.maker}</dd>
+                    </div>
+                    <div className="flex gap-2">
+                      <dt className="font-medium text-zinc-500 dark:text-zinc-500">
+                        発売年
+                      </dt>
+                      <dd>{phone.released_year}年</dd>
+                    </div>
+                  </dl>
+                </Link>
               </li>
             ))}
           </ul>
