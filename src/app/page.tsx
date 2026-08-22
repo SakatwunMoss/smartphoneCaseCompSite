@@ -1,4 +1,5 @@
 export const dynamic = "force-dynamic";
+import Image from "next/image";
 import Link from "next/link";
 
 import { supabase } from "@/lib/supabase";
@@ -22,51 +23,78 @@ export default async function Home() {
   const { phones, error } = await getPhones();
 
   return (
-    <div className="flex flex-1 flex-col bg-zinc-50 px-6 py-10 dark:bg-black">
-      <main className="mx-auto w-full max-w-6xl">
-        <h1 className="mb-8 text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-4xl">
-          スマホケース比較
-        </h1>
+    <div className="flex flex-1 flex-col">
+      <section
+        aria-labelledby="hero-heading"
+        className="relative isolate h-[45vh] w-full overflow-hidden"
+      >
+        <div className="absolute inset-0 z-0">
+          <Image
+            src="/images/hero-bg.jpg"
+            alt=""
+            fill
+            priority
+            className="object-cover blur-[3px]"
+            sizes="100vw"
+          />
+        </div>
+        <div
+          className="absolute inset-0 z-10 bg-gradient-to-b from-black/80 via-black/70 to-zinc-950"
+          aria-hidden
+        />
+        <div className="relative z-20 flex h-full items-center justify-center px-6 text-center">
+          <div>
+            <h1
+              id="hero-heading"
+              className="text-2xl font-semibold tracking-tight text-white sm:text-3xl"
+            >
+              ケース比較
+            </h1>
+            <p className="mt-3 text-sm text-zinc-200 sm:text-base">
+              気になる端末のケースを比較しよう
+            </p>
+          </div>
+        </div>
+      </section>
 
-        {error ? (
-          <p className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-300">
-            データの取得に失敗しました。しばらくしてから再度お試しください。
-          </p>
-        ) : phones && phones.length > 0 ? (
-          <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {phones.map((phone) => (
-              <li key={phone.id}>
-                <Link
-                  href={`/phones/${phone.id}`}
-                  className="block rounded-lg border border-zinc-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900"
-                >
-                  <h2 className="mb-2 text-lg font-medium text-zinc-900 dark:text-zinc-50">
-                    {phone.name}
-                  </h2>
-                  <dl className="space-y-1 text-sm text-zinc-600 dark:text-zinc-400">
-                    <div className="flex gap-2">
-                      <dt className="font-medium text-zinc-500 dark:text-zinc-500">
-                        メーカー
-                      </dt>
-                      <dd>{phone.maker}</dd>
-                    </div>
-                    <div className="flex gap-2">
-                      <dt className="font-medium text-zinc-500 dark:text-zinc-500">
-                        発売年
-                      </dt>
-                      <dd>{phone.released_year}年</dd>
-                    </div>
-                  </dl>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="text-zinc-600 dark:text-zinc-400">
-            データがありません
-          </p>
-        )}
-      </main>
+      <div className="px-6 py-10">
+        <main className="mx-auto w-full max-w-6xl">
+          {error ? (
+            <p className="rounded-lg border border-red-900 bg-red-950 px-4 py-3 text-red-300">
+              データの取得に失敗しました。しばらくしてから再度お試しください。
+            </p>
+          ) : phones && phones.length > 0 ? (
+            <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {phones.map((phone) => (
+                <li key={phone.id}>
+                  <Link
+                    href={`/phones/${phone.id}`}
+                    className="block rounded-lg border border-zinc-800 bg-zinc-900 p-4 transition-all hover:border-cyan-500/60 hover:shadow-[0_0_20px_rgba(6,182,212,0.15)]"
+                  >
+                    <h2 className="mb-2 text-lg font-medium tracking-tight text-zinc-100">
+                      {phone.name}
+                    </h2>
+                    <dl className="space-y-1 text-sm text-zinc-400">
+                      <div className="flex gap-2">
+                        <dt className="font-medium text-zinc-500">メーカー</dt>
+                        <dd>{phone.maker}</dd>
+                      </div>
+                      <div className="flex gap-2">
+                        <dt className="font-medium text-zinc-500">発売年</dt>
+                        <dd className="font-medium tracking-tight">
+                          {phone.released_year}年
+                        </dd>
+                      </div>
+                    </dl>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-zinc-400">データがありません</p>
+          )}
+        </main>
+      </div>
     </div>
   );
 }
