@@ -18,6 +18,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  // 相対パスの OG / Twitter 画像などを絶対 URL に解決する
+  metadataBase: new URL("https://smartphone-case-comp-site.vercel.app"),
   title: "Phone Case Compare",
   description: "スマホケースを比較するサイト",
   openGraph: {
