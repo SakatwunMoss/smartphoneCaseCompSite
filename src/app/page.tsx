@@ -2,8 +2,11 @@ export const dynamic = "force-dynamic";
 import Image from "next/image";
 import Link from "next/link";
 
+import { columns } from "@/lib/columns";
 import { supabase } from "@/lib/supabase";
 import type { Phone } from "@/types/database";
+
+const featuredColumns = columns.slice(0, 3);
 
 async function getPhones(): Promise<{
   phones: Phone[] | null;
@@ -93,6 +96,45 @@ export default async function Home() {
           ) : (
             <p className="text-zinc-400">データがありません</p>
           )}
+
+          <section aria-labelledby="columns-heading" className="mt-14">
+            <div className="mb-6 flex items-end justify-between gap-4">
+              <div>
+                <h2
+                  id="columns-heading"
+                  className="text-xl font-semibold tracking-tight text-zinc-100"
+                >
+                  コラム
+                </h2>
+                <p className="mt-1 text-sm text-zinc-400">
+                  ケース選びに役立つ記事をピックアップ
+                </p>
+              </div>
+              <Link
+                href="/columns"
+                className="shrink-0 text-sm text-cyan-400 transition-colors hover:text-cyan-300"
+              >
+                すべて見る →
+              </Link>
+            </div>
+            <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {featuredColumns.map((column) => (
+                <li key={column.slug}>
+                  <Link
+                    href={`/columns/${column.slug}`}
+                    className="block h-full rounded-lg border border-zinc-800 bg-zinc-900 p-5 transition-all hover:border-cyan-500/60 hover:shadow-[0_0_20px_rgba(6,182,212,0.15)]"
+                  >
+                    <h3 className="mb-2 text-base font-medium tracking-tight text-zinc-100">
+                      {column.title}
+                    </h3>
+                    <p className="text-sm leading-relaxed text-zinc-400">
+                      {column.excerpt}
+                    </p>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
         </main>
       </div>
     </div>
