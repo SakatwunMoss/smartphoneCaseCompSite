@@ -91,7 +91,10 @@ export default async function PhoneDetailPage({ params }: PageProps) {
         ) : null}
 
         <section>
-          <h2 className="mb-4 text-xl font-medium text-gray-900">対応ケース</h2>
+          <h2 className="mb-2 text-xl font-medium text-gray-900">対応ケース</h2>
+          <p className="mb-3 text-xs text-gray-400">
+            ※表示価格は変動する場合があります。購入の際は各販売元の最新価格をご確認ください。
+          </p>
 
           {cases.length > 0 ? (
             <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
