@@ -2,6 +2,7 @@ export const dynamic = "force-dynamic";
 import Image from "next/image";
 import Link from "next/link";
 
+import { ProductImage } from "@/components/ProductImage";
 import { columns } from "@/lib/columns";
 import { supabase } from "@/lib/supabase";
 import type { Phone } from "@/types/database";
@@ -62,8 +63,11 @@ export default async function Home() {
                 <li key={phone.id}>
                   <Link
                     href={`/phones/${phone.id}`}
-                    className="block rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition-all hover:border-orange-300 hover:shadow-md"
+                    className="flex min-h-[11rem] flex-col rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition-all hover:border-orange-300 hover:shadow-md"
                   >
+                    {phone.image_url ? (
+                      <ProductImage src={phone.image_url} alt={phone.name} />
+                    ) : null}
                     <h2 className="mb-2 text-lg font-medium tracking-tight text-gray-900">
                       {phone.name}
                     </h2>

@@ -3,6 +3,7 @@ export type Phone = {
   name: string;
   maker: string;
   released_year: number;
+  image_url?: string | null;
 };
 
 export type Case = {
@@ -13,6 +14,7 @@ export type Case = {
   price: number;
   url: string;
   created_at: string;
+  image_url?: string | null;
 };
 
 export type Database = {

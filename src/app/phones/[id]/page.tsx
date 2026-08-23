@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { ProductImage } from "@/components/ProductImage";
 import { supabase } from "@/lib/supabase";
 import type { Case, Phone } from "@/types/database";
 
@@ -101,8 +102,15 @@ export default async function PhoneDetailPage({ params }: PageProps) {
               {cases.map((caseItem) => (
                 <li
                   key={caseItem.id}
-                  className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition-all hover:border-orange-300 hover:shadow-md"
+                  className="flex min-h-[14rem] flex-col rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition-all hover:border-orange-300 hover:shadow-md"
                 >
+                  {caseItem.image_url ? (
+                    <ProductImage
+                      src={caseItem.image_url}
+                      alt={caseItem.name}
+                      aspectClassName="aspect-square"
+                    />
+                  ) : null}
                   <h3 className="mb-2 text-lg font-medium tracking-tight text-gray-900">
                     {caseItem.name}
                   </h3>
