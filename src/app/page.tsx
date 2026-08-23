@@ -12,7 +12,10 @@ async function getPhones(): Promise<{
   phones: Phone[] | null;
   error: string | null;
 }> {
-  const { data, error } = await supabase.from("phones").select("*");
+  const { data, error } = await supabase
+    .from("phones")
+    .select("*")
+    .order("released_year", { ascending: false });
 
   if (error) {
     console.error("Failed to fetch phones:", error);
