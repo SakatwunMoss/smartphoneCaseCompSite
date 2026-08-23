@@ -14,15 +14,15 @@ export default function ColumnsPage() {
       <main className="mx-auto w-full max-w-6xl">
         <Link
           href="/"
-          className="mb-6 inline-block text-sm text-zinc-400 transition-colors hover:text-cyan-400"
+          className="mb-6 inline-block text-sm text-gray-600 transition-colors hover:text-orange-600"
         >
           ← 一覧に戻る
         </Link>
 
-        <h1 className="mb-2 text-3xl font-semibold tracking-tight text-zinc-100">
+        <h1 className="mb-2 text-3xl font-semibold tracking-tight text-gray-900">
           コラム
         </h1>
-        <p className="mb-8 text-sm text-zinc-400">
+        <p className="mb-8 text-sm text-gray-600">
           スマホケース選びに役立つ記事をまとめています。
         </p>
 
@@ -31,12 +31,12 @@ export default function ColumnsPage() {
             <li key={column.slug}>
               <Link
                 href={`/columns/${column.slug}`}
-                className="block h-full rounded-lg border border-zinc-800 bg-zinc-900 p-5 transition-all hover:border-cyan-500/60 hover:shadow-[0_0_20px_rgba(6,182,212,0.15)]"
+                className="block h-full rounded-xl border border-gray-200 bg-white p-5 shadow-sm transition-all hover:border-orange-300 hover:shadow-md"
               >
-                <h2 className="mb-2 text-lg font-medium tracking-tight text-zinc-100">
+                <h2 className="mb-2 text-lg font-medium tracking-tight text-gray-900">
                   {column.title}
                 </h2>
-                <p className="text-sm leading-relaxed text-zinc-400">
+                <p className="text-sm leading-relaxed text-gray-600">
                   {column.excerpt}
                 </p>
               </Link>

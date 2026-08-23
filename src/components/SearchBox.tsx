@@ -30,11 +30,11 @@ export function SearchBox() {
         value={query}
         onChange={(event) => setQuery(event.target.value)}
         placeholder="機種・ケースを検索"
-        className="min-w-0 flex-1 rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-500 outline-none transition-colors focus:border-cyan-500/60 focus:ring-1 focus:ring-cyan-500/40"
+        className="min-w-0 flex-1 rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 outline-none transition-colors focus:border-orange-400 focus:ring-1 focus:ring-orange-400/40"
       />
       <button
         type="submit"
-        className="shrink-0 rounded-lg border border-cyan-500/40 bg-cyan-500/10 px-3 py-2 text-sm font-medium text-cyan-300 transition-colors hover:border-cyan-400/60 hover:bg-cyan-500/20 hover:text-cyan-200"
+        className="shrink-0 rounded-xl bg-orange-500 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-orange-600"
       >
         検索
       </button>

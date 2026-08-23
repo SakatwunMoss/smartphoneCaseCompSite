@@ -12,18 +12,18 @@ export default function PrivacyPolicyPage() {
       <main className="mx-auto w-full max-w-3xl">
         <Link
           href="/"
-          className="mb-6 inline-block text-sm text-zinc-400 transition-colors hover:text-cyan-400"
+          className="mb-6 inline-block text-sm text-gray-600 transition-colors hover:text-orange-600"
         >
           ← 一覧に戻る
         </Link>
 
-        <h1 className="mb-8 text-3xl font-semibold tracking-tight text-zinc-100">
+        <h1 className="mb-8 text-3xl font-semibold tracking-tight text-gray-900">
           プライバシーポリシー
         </h1>
 
-        <div className="space-y-8 text-sm leading-relaxed text-zinc-400">
+        <div className="space-y-8 text-sm leading-relaxed text-gray-600">
           <section>
-            <h2 className="mb-3 text-lg font-medium text-zinc-100">
+            <h2 className="mb-3 text-lg font-medium text-gray-900">
               サイトについて
             </h2>
             <p>
@@ -33,7 +33,7 @@ export default function PrivacyPolicyPage() {
           </section>
 
           <section>
-            <h2 className="mb-3 text-lg font-medium text-zinc-100">
+            <h2 className="mb-3 text-lg font-medium text-gray-900">
               広告について
             </h2>
             <p className="mb-3">
@@ -48,7 +48,7 @@ export default function PrivacyPolicyPage() {
           </section>
 
           <section>
-            <h2 className="mb-3 text-lg font-medium text-zinc-100">
+            <h2 className="mb-3 text-lg font-medium text-gray-900">
               アクセス解析について
             </h2>
             <p>
@@ -58,7 +58,7 @@ export default function PrivacyPolicyPage() {
           </section>
 
           <section>
-            <h2 className="mb-3 text-lg font-medium text-zinc-100">
+            <h2 className="mb-3 text-lg font-medium text-gray-900">
               掲載情報について
             </h2>
             <p>
@@ -67,7 +67,7 @@ export default function PrivacyPolicyPage() {
           </section>
 
           <section>
-            <h2 className="mb-3 text-lg font-medium text-zinc-100">
+            <h2 className="mb-3 text-lg font-medium text-gray-900">
               プライバシーポリシーの変更
             </h2>
             <p>
@@ -75,7 +75,7 @@ export default function PrivacyPolicyPage() {
             </p>
           </section>
 
-          <p className="pt-4 text-zinc-500">制定日: 2026年8月23日</p>
+          <p className="pt-4 text-gray-500">制定日: 2026年8月23日</p>
         </div>
       </main>
     </div>

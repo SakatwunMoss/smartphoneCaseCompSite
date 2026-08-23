@@ -29,31 +29,22 @@ export default async function Home() {
     <div className="flex flex-1 flex-col">
       <section
         aria-labelledby="hero-heading"
-        className="relative isolate h-[45vh] w-full overflow-hidden"
+        className="relative h-[50vh] min-h-[220px] max-h-[420px] w-full overflow-hidden bg-orange-50 sm:h-[45vh] sm:max-h-[480px]"
       >
-        <div className="absolute inset-0 z-0">
-          <Image
-            src="/images/hero-bg.jpg"
-            alt=""
-            fill
-            priority
-            className="object-cover blur-[3px]"
-            sizes="100vw"
-          />
-        </div>
-        <div
-          className="absolute inset-0 z-10 bg-gradient-to-b from-black/80 via-black/70 to-zinc-950"
-          aria-hidden
+        <Image
+          src="/images/hero-main.png"
+          alt="PHONE CASE COMPARE"
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover object-[35%_center] sm:object-center"
         />
-        <div className="relative z-20 flex h-full items-center justify-center px-6 text-center">
-          <div>
-            <h1
-              id="hero-heading"
-              className="text-2xl font-semibold tracking-tight text-white sm:text-3xl"
-            >
-              ケース比較
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-white/80 to-transparent pt-16">
+          <div className="bg-white/90 px-6 py-3 text-center sm:py-3.5">
+            <h1 id="hero-heading" className="sr-only">
+              PHONE CASE COMPARE
             </h1>
-            <p className="mt-3 text-sm text-zinc-200 sm:text-base">
+            <p className="text-sm text-gray-700 sm:text-base">
               気になる端末のケースを比較しよう
             </p>
           </div>
@@ -63,7 +54,7 @@ export default async function Home() {
       <div className="px-6 py-10">
         <main className="mx-auto w-full max-w-6xl">
           {error ? (
-            <p className="rounded-lg border border-red-900 bg-red-950 px-4 py-3 text-red-300">
+            <p className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-red-700">
               データの取得に失敗しました。しばらくしてから再度お試しください。
             </p>
           ) : phones && phones.length > 0 ? (
@@ -72,18 +63,18 @@ export default async function Home() {
                 <li key={phone.id}>
                   <Link
                     href={`/phones/${phone.id}`}
-                    className="block rounded-lg border border-zinc-800 bg-zinc-900 p-4 transition-all hover:border-cyan-500/60 hover:shadow-[0_0_20px_rgba(6,182,212,0.15)]"
+                    className="block rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition-all hover:border-orange-300 hover:shadow-md"
                   >
-                    <h2 className="mb-2 text-lg font-medium tracking-tight text-zinc-100">
+                    <h2 className="mb-2 text-lg font-medium tracking-tight text-gray-900">
                       {phone.name}
                     </h2>
-                    <dl className="space-y-1 text-sm text-zinc-400">
+                    <dl className="space-y-1 text-sm text-gray-600">
                       <div className="flex gap-2">
-                        <dt className="font-medium text-zinc-500">メーカー</dt>
+                        <dt className="font-medium text-gray-500">メーカー</dt>
                         <dd>{phone.maker}</dd>
                       </div>
                       <div className="flex gap-2">
-                        <dt className="font-medium text-zinc-500">発売年</dt>
+                        <dt className="font-medium text-gray-500">発売年</dt>
                         <dd className="font-medium tracking-tight">
                           {phone.released_year}年
                         </dd>
@@ -94,25 +85,28 @@ export default async function Home() {
               ))}
             </ul>
           ) : (
-            <p className="text-zinc-400">データがありません</p>
+            <p className="text-gray-600">データがありません</p>
           )}
 
-          <section aria-labelledby="columns-heading" className="mt-14">
+          <section
+            aria-labelledby="columns-heading"
+            className="mt-14 rounded-xl bg-orange-50/60 px-5 py-8 sm:px-8"
+          >
             <div className="mb-6 flex items-end justify-between gap-4">
               <div>
                 <h2
                   id="columns-heading"
-                  className="text-xl font-semibold tracking-tight text-zinc-100"
+                  className="text-xl font-semibold tracking-tight text-gray-900"
                 >
                   コラム
                 </h2>
-                <p className="mt-1 text-sm text-zinc-400">
+                <p className="mt-1 text-sm text-gray-600">
                   ケース選びに役立つ記事をピックアップ
                 </p>
               </div>
               <Link
                 href="/columns"
-                className="shrink-0 text-sm text-cyan-400 transition-colors hover:text-cyan-300"
+                className="shrink-0 text-sm text-orange-500 transition-colors hover:text-orange-600"
               >
                 すべて見る →
               </Link>
@@ -122,12 +116,12 @@ export default async function Home() {
                 <li key={column.slug}>
                   <Link
                     href={`/columns/${column.slug}`}
-                    className="block h-full rounded-lg border border-zinc-800 bg-zinc-900 p-5 transition-all hover:border-cyan-500/60 hover:shadow-[0_0_20px_rgba(6,182,212,0.15)]"
+                    className="block h-full rounded-xl border border-gray-200 bg-white p-5 shadow-sm transition-all hover:border-orange-300 hover:shadow-md"
                   >
-                    <h3 className="mb-2 text-base font-medium tracking-tight text-zinc-100">
+                    <h3 className="mb-2 text-base font-medium tracking-tight text-gray-900">
                       {column.title}
                     </h3>
-                    <p className="text-sm leading-relaxed text-zinc-400">
+                    <p className="text-sm leading-relaxed text-gray-600">
                       {column.excerpt}
                     </p>
                   </Link>

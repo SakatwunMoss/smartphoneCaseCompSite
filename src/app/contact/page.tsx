@@ -14,15 +14,15 @@ export default function ContactPage() {
       <main className="mx-auto w-full max-w-3xl">
         <Link
           href="/"
-          className="mb-6 inline-block text-sm text-zinc-400 transition-colors hover:text-cyan-400"
+          className="mb-6 inline-block text-sm text-gray-600 transition-colors hover:text-orange-600"
         >
           ← 一覧に戻る
         </Link>
 
-        <h1 className="mb-3 text-3xl font-semibold tracking-tight text-zinc-100">
+        <h1 className="mb-3 text-3xl font-semibold tracking-tight text-gray-900">
           お問い合わせ
         </h1>
-        <p className="mb-8 text-sm leading-relaxed text-zinc-400">
+        <p className="mb-8 text-sm leading-relaxed text-gray-600">
           ご質問・ご意見などがございましたら、以下のフォームよりお問い合わせください。
         </p>
 

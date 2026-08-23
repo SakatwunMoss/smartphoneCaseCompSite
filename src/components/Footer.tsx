@@ -10,27 +10,27 @@ const FOOTER_LINKS = [
 
 export function Footer() {
   return (
-    <footer className="mt-auto border-t border-zinc-800/80 bg-zinc-950">
+    <footer className="mt-auto border-t border-gray-200 bg-gray-50">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-6 py-8">
         <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
           <div className="max-w-sm">
-            <p className="text-sm font-semibold tracking-tight text-zinc-100">
+            <p className="text-sm font-semibold tracking-tight text-gray-900">
               Phone Case Compare
             </p>
-            <p className="mt-2 text-sm leading-relaxed text-zinc-500">
+            <p className="mt-2 text-sm leading-relaxed text-gray-500">
               スマホケースを比較するサイト
             </p>
           </div>
 
           <nav
             aria-label="フッターナビゲーション"
-            className="flex flex-wrap gap-x-5 gap-y-2 text-sm text-zinc-400"
+            className="flex flex-wrap gap-x-5 gap-y-2 text-sm text-gray-600"
           >
             {FOOTER_LINKS.map(({ href, label }) => (
               <Link
                 key={href}
                 href={href}
-                className="transition-colors hover:text-cyan-400"
+                className="transition-colors hover:text-orange-600"
               >
                 {label}
               </Link>
@@ -38,7 +38,7 @@ export function Footer() {
           </nav>
         </div>
 
-        <p className="border-t border-zinc-800/60 pt-4 text-xs text-zinc-500">
+        <p className="border-t border-gray-200 pt-4 text-xs text-gray-500">
           © 2026 Phone Case Compare
         </p>
       </div>

@@ -12,25 +12,25 @@ export default function AboutPage() {
       <main className="mx-auto w-full max-w-3xl">
         <Link
           href="/"
-          className="mb-6 inline-block text-sm text-zinc-400 transition-colors hover:text-cyan-400"
+          className="mb-6 inline-block text-sm text-gray-600 transition-colors hover:text-orange-600"
         >
           ← 一覧に戻る
         </Link>
 
-        <h1 className="mb-8 text-3xl font-semibold tracking-tight text-zinc-100">
+        <h1 className="mb-8 text-3xl font-semibold tracking-tight text-gray-900">
           運営者情報
         </h1>
 
-        <div className="space-y-8 text-sm leading-relaxed text-zinc-400">
+        <div className="space-y-8 text-sm leading-relaxed text-gray-600">
           <section>
-            <h2 className="mb-3 text-lg font-medium text-zinc-100">
+            <h2 className="mb-3 text-lg font-medium text-gray-900">
               サイト名
             </h2>
             <p>Phone Case Compare</p>
           </section>
 
           <section>
-            <h2 className="mb-3 text-lg font-medium text-zinc-100">
+            <h2 className="mb-3 text-lg font-medium text-gray-900">
               サイトの目的
             </h2>
             <p>
@@ -39,17 +39,17 @@ export default function AboutPage() {
           </section>
 
           <section>
-            <h2 className="mb-3 text-lg font-medium text-zinc-100">運営者</h2>
+            <h2 className="mb-3 text-lg font-medium text-gray-900">運営者</h2>
             <p>当サイトは個人により運営されています（当サイト運営者）。</p>
           </section>
 
           <section>
-            <h2 className="mb-3 text-lg font-medium text-zinc-100">連絡先</h2>
+            <h2 className="mb-3 text-lg font-medium text-gray-900">連絡先</h2>
             <p>
               ご連絡は{" "}
               <Link
                 href="/contact"
-                className="text-cyan-400 underline-offset-2 transition-colors hover:text-cyan-300 hover:underline"
+                className="text-orange-500 underline-offset-2 transition-colors hover:text-orange-600 hover:underline"
               >
                 お問い合わせページ
               </Link>

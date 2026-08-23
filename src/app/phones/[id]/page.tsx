@@ -61,22 +61,22 @@ export default async function PhoneDetailPage({ params }: PageProps) {
       <main className="mx-auto w-full max-w-6xl">
         <Link
           href="/"
-          className="mb-6 inline-block text-sm text-zinc-400 transition-colors hover:text-cyan-400"
+          className="mb-6 inline-block text-sm text-gray-600 transition-colors hover:text-orange-600"
         >
           ← 一覧に戻る
         </Link>
 
-        <header className="mb-8 rounded-lg border border-zinc-800 bg-zinc-900 p-6">
-          <h1 className="mb-3 text-3xl font-semibold tracking-tight text-zinc-100 sm:text-4xl">
+        <header className="mb-8 rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+          <h1 className="mb-3 text-3xl font-semibold tracking-tight text-gray-900 sm:text-4xl">
             {phone.name}
           </h1>
-          <dl className="flex flex-wrap gap-x-6 gap-y-1 text-sm text-zinc-400">
+          <dl className="flex flex-wrap gap-x-6 gap-y-1 text-sm text-gray-600">
             <div className="flex gap-2">
-              <dt className="font-medium text-zinc-500">メーカー</dt>
+              <dt className="font-medium text-gray-500">メーカー</dt>
               <dd>{phone.maker}</dd>
             </div>
             <div className="flex gap-2">
-              <dt className="font-medium text-zinc-500">発売年</dt>
+              <dt className="font-medium text-gray-500">発売年</dt>
               <dd className="font-medium tracking-tight">
                 {phone.released_year}年
               </dd>
@@ -85,31 +85,31 @@ export default async function PhoneDetailPage({ params }: PageProps) {
         </header>
 
         {phone.description?.trim() ? (
-          <p className="my-3 max-w-2xl text-sm leading-relaxed text-zinc-400">
+          <p className="my-3 max-w-2xl text-sm leading-relaxed text-gray-600">
             {phone.description}
           </p>
         ) : null}
 
         <section>
-          <h2 className="mb-4 text-xl font-medium text-zinc-100">対応ケース</h2>
+          <h2 className="mb-4 text-xl font-medium text-gray-900">対応ケース</h2>
 
           {cases.length > 0 ? (
             <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {cases.map((caseItem) => (
                 <li
                   key={caseItem.id}
-                  className="rounded-lg border border-zinc-800 bg-zinc-900 p-4 transition-all hover:border-cyan-500/60 hover:shadow-[0_0_20px_rgba(6,182,212,0.15)]"
+                  className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition-all hover:border-orange-300 hover:shadow-md"
                 >
-                  <h3 className="mb-2 text-lg font-medium tracking-tight text-zinc-100">
+                  <h3 className="mb-2 text-lg font-medium tracking-tight text-gray-900">
                     {caseItem.name}
                   </h3>
-                  <dl className="mb-4 space-y-1 text-sm text-zinc-400">
+                  <dl className="mb-4 space-y-1 text-sm text-gray-600">
                     <div className="flex gap-2">
-                      <dt className="font-medium text-zinc-500">ブランド</dt>
+                      <dt className="font-medium text-gray-500">ブランド</dt>
                       <dd>{caseItem.brand}</dd>
                     </div>
                     <div className="flex gap-2">
-                      <dt className="font-medium text-zinc-500">価格</dt>
+                      <dt className="font-medium text-gray-500">価格</dt>
                       <dd className="font-medium tracking-tight">
                         {formatPrice(caseItem.price)}
                       </dd>
@@ -119,7 +119,7 @@ export default async function PhoneDetailPage({ params }: PageProps) {
                     href={caseItem.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-block text-sm font-medium text-cyan-400 underline-offset-2 transition-colors hover:text-cyan-300 hover:underline"
+                    className="inline-block text-sm font-medium text-orange-500 underline-offset-2 transition-colors hover:text-orange-600 hover:underline"
                   >
                     購入先を見る →
                   </a>
@@ -127,7 +127,7 @@ export default async function PhoneDetailPage({ params }: PageProps) {
               ))}
             </ul>
           ) : (
-            <p className="rounded-lg border border-zinc-800 bg-zinc-900 px-4 py-8 text-center text-zinc-400">
+            <p className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-8 text-center text-gray-600">
               対応ケースがまだ登録されていません
             </p>
           )}

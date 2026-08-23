@@ -16,7 +16,7 @@ export function ContactForm() {
         <div>
           <label
             htmlFor="name"
-            className="mb-2 block text-sm font-medium text-zinc-300"
+            className="mb-2 block text-sm font-medium text-gray-700"
           >
             お名前
           </label>
@@ -25,7 +25,7 @@ export function ContactForm() {
             name="name"
             type="text"
             required
-            className="w-full rounded-lg border border-zinc-700 bg-zinc-900 px-4 py-2.5 text-sm text-zinc-100 placeholder:text-zinc-600 outline-none transition-colors focus:border-cyan-500/60 focus:ring-1 focus:ring-cyan-500/40"
+            className="w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 outline-none transition-colors focus:border-orange-400 focus:ring-1 focus:ring-orange-400/40"
             placeholder="山田 太郎"
           />
         </div>
@@ -33,7 +33,7 @@ export function ContactForm() {
         <div>
           <label
             htmlFor="email"
-            className="mb-2 block text-sm font-medium text-zinc-300"
+            className="mb-2 block text-sm font-medium text-gray-700"
           >
             メールアドレス
           </label>
@@ -42,7 +42,7 @@ export function ContactForm() {
             name="email"
             type="email"
             required
-            className="w-full rounded-lg border border-zinc-700 bg-zinc-900 px-4 py-2.5 text-sm text-zinc-100 placeholder:text-zinc-600 outline-none transition-colors focus:border-cyan-500/60 focus:ring-1 focus:ring-cyan-500/40"
+            className="w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 outline-none transition-colors focus:border-orange-400 focus:ring-1 focus:ring-orange-400/40"
             placeholder="example@email.com"
           />
         </div>
@@ -50,7 +50,7 @@ export function ContactForm() {
         <div>
           <label
             htmlFor="message"
-            className="mb-2 block text-sm font-medium text-zinc-300"
+            className="mb-2 block text-sm font-medium text-gray-700"
           >
             お問い合わせ内容
           </label>
@@ -59,14 +59,14 @@ export function ContactForm() {
             name="message"
             required
             rows={6}
-            className="w-full resize-y rounded-lg border border-zinc-700 bg-zinc-900 px-4 py-2.5 text-sm text-zinc-100 placeholder:text-zinc-600 outline-none transition-colors focus:border-cyan-500/60 focus:ring-1 focus:ring-cyan-500/40"
+            className="w-full resize-y rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 outline-none transition-colors focus:border-orange-400 focus:ring-1 focus:ring-orange-400/40"
             placeholder="お問い合わせ内容をご記入ください"
           />
         </div>
 
         <button
           type="submit"
-          className="rounded-lg border border-cyan-500/50 bg-cyan-500/10 px-5 py-2.5 text-sm font-medium text-cyan-300 transition-colors hover:border-cyan-400 hover:bg-cyan-500/20 hover:text-cyan-200"
+          className="rounded-xl bg-orange-500 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-orange-600"
         >
           送信する
         </button>
@@ -75,7 +75,7 @@ export function ContactForm() {
       {message ? (
         <p
           role="status"
-          className="mt-6 rounded-lg border border-zinc-700 bg-zinc-900 px-4 py-3 text-sm text-zinc-300"
+          className="mt-6 rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-700"
         >
           {message}
         </p>

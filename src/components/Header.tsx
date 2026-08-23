@@ -9,7 +9,7 @@ import { SearchBox } from "@/components/SearchBox";
 const NAV_LINKS = [
   { href: "/", label: "ホーム" },
   { href: "/columns", label: "コラム" },
-  { href: "/about", label: "について" },
+  { href: "/about", label: "サイトについて" },
 ] as const;
 
 function isActivePath(pathname: string, href: string) {
@@ -28,12 +28,12 @@ export function Header() {
   }
 
   return (
-    <header className="sticky top-0 z-50 border-b border-zinc-800/80 bg-zinc-950/90 backdrop-blur-md">
+    <header className="sticky top-0 z-50 border-b border-amber-100/80 bg-amber-50/90 backdrop-blur-md">
       <div className="mx-auto flex w-full max-w-6xl items-center gap-4 px-6 py-3">
         <Link
           href="/"
           onClick={closeMenu}
-          className="shrink-0 text-sm font-semibold tracking-tight text-zinc-100 transition-colors hover:text-cyan-300 sm:text-base"
+          className="shrink-0 text-sm font-semibold tracking-tight text-gray-900 transition-colors hover:text-orange-600 sm:text-base"
         >
           Phone Case Compare
         </Link>
@@ -50,8 +50,8 @@ export function Header() {
                 href={href}
                 className={`text-sm transition-colors ${
                   active
-                    ? "font-medium text-cyan-400"
-                    : "text-zinc-400 hover:text-cyan-400"
+                    ? "font-medium text-orange-600"
+                    : "text-gray-700 hover:text-orange-600"
                 }`}
                 aria-current={active ? "page" : undefined}
               >
@@ -67,7 +67,7 @@ export function Header() {
 
         <button
           type="button"
-          className="ml-auto inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-zinc-800 text-zinc-300 transition-colors hover:border-cyan-500/40 hover:text-cyan-300 md:hidden"
+          className="ml-auto inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-amber-200/80 text-gray-700 transition-colors hover:border-orange-300 hover:text-orange-600 md:hidden"
           aria-expanded={menuOpen}
           aria-controls="mobile-nav"
           onClick={() => setMenuOpen((open) => !open)}
@@ -101,7 +101,7 @@ export function Header() {
         </button>
       </div>
 
-      <div className="border-t border-zinc-800/60 px-6 py-3 md:hidden">
+      <div className="border-t border-amber-100/80 px-6 py-3 md:hidden">
         <SearchBox />
       </div>
 
@@ -109,7 +109,7 @@ export function Header() {
         <nav
           id="mobile-nav"
           aria-label="モバイルナビゲーション"
-          className="border-t border-zinc-800/60 px-6 py-3 md:hidden"
+          className="border-t border-amber-100/80 px-6 py-3 md:hidden"
         >
           <ul className="flex flex-col gap-1">
             {NAV_LINKS.map(({ href, label }) => {
@@ -119,10 +119,10 @@ export function Header() {
                   <Link
                     href={href}
                     onClick={closeMenu}
-                    className={`block rounded-lg px-3 py-2.5 text-sm transition-colors ${
+                    className={`block rounded-xl px-3 py-2.5 text-sm transition-colors ${
                       active
-                        ? "bg-cyan-500/10 font-medium text-cyan-400"
-                        : "text-zinc-400 hover:bg-zinc-900 hover:text-cyan-400"
+                        ? "bg-orange-100/70 font-medium text-orange-600"
+                        : "text-gray-700 hover:bg-amber-100/60 hover:text-orange-600"
                     }`}
                     aria-current={active ? "page" : undefined}
                   >

@@ -59,7 +59,7 @@ export default async function SearchPage({ searchParams }: PageProps) {
     return (
       <div className="flex flex-1 flex-col px-6 py-10">
         <main className="mx-auto w-full max-w-6xl">
-          <p className="rounded-lg border border-zinc-800 bg-zinc-900 px-4 py-8 text-center text-zinc-400">
+          <p className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-8 text-center text-gray-600">
             検索キーワードを入力してください
           </p>
         </main>
@@ -77,12 +77,12 @@ export default async function SearchPage({ searchParams }: PageProps) {
   return (
     <div className="flex flex-1 flex-col px-6 py-10">
       <main className="mx-auto w-full max-w-6xl">
-        <h1 className="mb-8 text-2xl font-semibold tracking-tight text-zinc-100 sm:text-3xl">
+        <h1 className="mb-8 text-2xl font-semibold tracking-tight text-gray-900 sm:text-3xl">
           「{keyword}」の検索結果
         </h1>
 
         {!hasResults ? (
-          <p className="rounded-lg border border-zinc-800 bg-zinc-900 px-4 py-8 text-center text-zinc-400">
+          <p className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-8 text-center text-gray-600">
             一致する結果が見つかりませんでした
           </p>
         ) : (
@@ -91,7 +91,7 @@ export default async function SearchPage({ searchParams }: PageProps) {
               <section aria-labelledby="phones-heading">
                 <h2
                   id="phones-heading"
-                  className="mb-4 text-xl font-medium text-zinc-100"
+                  className="mb-4 text-xl font-medium text-gray-900"
                 >
                   対応機種
                 </h2>
@@ -100,20 +100,20 @@ export default async function SearchPage({ searchParams }: PageProps) {
                     <li key={phone.id}>
                       <Link
                         href={`/phones/${phone.id}`}
-                        className="block rounded-lg border border-zinc-800 bg-zinc-900 p-4 transition-all hover:border-cyan-500/60 hover:shadow-[0_0_20px_rgba(6,182,212,0.15)]"
+                        className="block rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition-all hover:border-orange-300 hover:shadow-md"
                       >
-                        <h3 className="mb-2 text-lg font-medium tracking-tight text-zinc-100">
+                        <h3 className="mb-2 text-lg font-medium tracking-tight text-gray-900">
                           {phone.name}
                         </h3>
-                        <dl className="space-y-1 text-sm text-zinc-400">
+                        <dl className="space-y-1 text-sm text-gray-600">
                           <div className="flex gap-2">
-                            <dt className="font-medium text-zinc-500">
+                            <dt className="font-medium text-gray-500">
                               メーカー
                             </dt>
                             <dd>{phone.maker}</dd>
                           </div>
                           <div className="flex gap-2">
-                            <dt className="font-medium text-zinc-500">発売年</dt>
+                            <dt className="font-medium text-gray-500">発売年</dt>
                             <dd className="font-medium tracking-tight">
                               {phone.released_year}年
                             </dd>
@@ -130,7 +130,7 @@ export default async function SearchPage({ searchParams }: PageProps) {
               <section aria-labelledby="cases-heading">
                 <h2
                   id="cases-heading"
-                  className="mb-4 text-xl font-medium text-zinc-100"
+                  className="mb-4 text-xl font-medium text-gray-900"
                 >
                   ケース
                 </h2>
@@ -139,26 +139,26 @@ export default async function SearchPage({ searchParams }: PageProps) {
                     <li key={caseItem.id}>
                       <Link
                         href={`/phones/${caseItem.phone_id}`}
-                        className="block rounded-lg border border-zinc-800 bg-zinc-900 p-4 transition-all hover:border-cyan-500/60 hover:shadow-[0_0_20px_rgba(6,182,212,0.15)]"
+                        className="block rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition-all hover:border-orange-300 hover:shadow-md"
                       >
-                        <h3 className="mb-2 text-lg font-medium tracking-tight text-zinc-100">
+                        <h3 className="mb-2 text-lg font-medium tracking-tight text-gray-900">
                           {caseItem.name}
                         </h3>
-                        <dl className="space-y-1 text-sm text-zinc-400">
+                        <dl className="space-y-1 text-sm text-gray-600">
                           <div className="flex gap-2">
-                            <dt className="font-medium text-zinc-500">
+                            <dt className="font-medium text-gray-500">
                               ブランド
                             </dt>
                             <dd>{caseItem.brand}</dd>
                           </div>
                           <div className="flex gap-2">
-                            <dt className="font-medium text-zinc-500">価格</dt>
+                            <dt className="font-medium text-gray-500">価格</dt>
                             <dd className="font-medium tracking-tight">
                               {formatPrice(caseItem.price)}
                             </dd>
                           </div>
                           <div className="flex gap-2">
-                            <dt className="font-medium text-zinc-500">端末</dt>
+                            <dt className="font-medium text-gray-500">端末</dt>
                             <dd>{caseItem.phones?.name ?? "—"}</dd>
                           </div>
                         </dl>

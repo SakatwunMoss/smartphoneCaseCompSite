@@ -41,16 +41,16 @@ export default async function ColumnDetailPage({ params }: PageProps) {
       <main className="mx-auto w-full max-w-3xl">
         <Link
           href="/columns"
-          className="mb-6 inline-block text-sm text-zinc-400 transition-colors hover:text-cyan-400"
+          className="mb-6 inline-block text-sm text-gray-600 transition-colors hover:text-orange-600"
         >
           ← コラム一覧に戻る
         </Link>
 
-        <h1 className="mb-8 text-3xl font-semibold tracking-tight text-zinc-100">
+        <h1 className="mb-8 text-3xl font-semibold tracking-tight text-gray-900">
           {column.title}
         </h1>
 
-        <div className="space-y-5 text-sm leading-relaxed text-zinc-400">
+        <div className="space-y-5 text-sm leading-relaxed text-gray-600">
           {column.body.map((paragraph, index) => (
             <p key={index}>{paragraph}</p>
           ))}
