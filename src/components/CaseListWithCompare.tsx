@@ -109,7 +109,7 @@ export function CaseListWithCompare({ cases }: CaseListWithCompareProps) {
                         <ProductImage
                           src={caseItem.image_url}
                           alt={caseItem.name}
-                          aspectClassName="aspect-square w-28"
+                          aspectClassName="aspect-square w-20"
                         />
                       ) : (
                         <span className="text-gray-400">—</span>
