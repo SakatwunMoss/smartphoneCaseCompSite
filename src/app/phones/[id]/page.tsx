@@ -8,10 +8,14 @@ type PageProps = {
   params: Promise<{ id: string }>;
 };
 
-async function getPhone(id: string): Promise<Phone | null> {
+type PhoneDetail = Phone & {
+  description: string | null;
+};
+
+async function getPhone(id: string): Promise<PhoneDetail | null> {
   const { data, error } = await supabase
     .from("phones")
-    .select("*")
+    .select("id, name, maker, released_year, description")
     .eq("id", id)
     .maybeSingle();
 
@@ -20,7 +24,7 @@ async function getPhone(id: string): Promise<Phone | null> {
     return null;
   }
 
-  return data;
+  return data as PhoneDetail | null;
 }
 
 async function getCases(phoneId: string): Promise<Case[]> {
@@ -79,6 +83,12 @@ export default async function PhoneDetailPage({ params }: PageProps) {
             </div>
           </dl>
         </header>
+
+        {phone.description?.trim() ? (
+          <p className="my-3 max-w-2xl text-sm leading-relaxed text-zinc-400">
+            {phone.description}
+          </p>
+        ) : null}
 
         <section>
           <h2 className="mb-4 text-xl font-medium text-zinc-100">対応ケース</h2>
