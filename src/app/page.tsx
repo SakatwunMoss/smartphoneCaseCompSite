@@ -27,27 +27,23 @@ export default async function Home() {
 
   return (
     <div className="flex flex-1 flex-col">
-      <section
-        aria-labelledby="hero-heading"
-        className="relative h-[50vh] min-h-[220px] max-h-[420px] w-full overflow-hidden bg-orange-50 sm:h-[45vh] sm:max-h-[480px]"
-      >
+      <section aria-labelledby="hero-heading" className="w-full bg-orange-50">
         <Image
           src="/images/hero-main.png"
           alt="PHONE CASE COMPARE"
-          fill
+          width={1584}
+          height={672}
           priority
           sizes="100vw"
-          className="object-cover object-[35%_center] sm:object-center"
+          className="h-auto w-full"
         />
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-white/80 to-transparent pt-16">
-          <div className="bg-white/90 px-6 py-3 text-center sm:py-3.5">
-            <h1 id="hero-heading" className="sr-only">
-              PHONE CASE COMPARE
-            </h1>
-            <p className="text-sm text-gray-700 sm:text-base">
-              気になる端末のケースを比較しよう
-            </p>
-          </div>
+        <div className="bg-white px-6 py-3 text-center sm:py-3.5">
+          <h1 id="hero-heading" className="sr-only">
+            PHONE CASE COMPARE
+          </h1>
+          <p className="text-sm text-gray-700 sm:text-base">
+            気になる端末のケースを比較しよう
+          </p>
         </div>
       </section>
 
