@@ -15,6 +15,26 @@ function formatPrice(price: number): string {
   return `¥${price.toLocaleString("ja-JP")}`;
 }
 
+function CompareTableImage({ src, alt }: { src: string; alt: string }) {
+  const [failed, setFailed] = useState(false);
+
+  if (failed) {
+    return null;
+  }
+
+  return (
+    <div className="h-20 w-20 shrink-0 overflow-hidden rounded-md bg-gray-100">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={src}
+        alt={alt}
+        className="h-full w-full object-cover"
+        onError={() => setFailed(true)}
+      />
+    </div>
+  );
+}
+
 export function CaseListWithCompare({ cases }: CaseListWithCompareProps) {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [showCompare, setShowCompare] = useState(false);
@@ -106,10 +126,9 @@ export function CaseListWithCompare({ cases }: CaseListWithCompareProps) {
                       className="border-b border-gray-100 px-3 py-4 align-top"
                     >
                       {caseItem.image_url ? (
-                        <ProductImage
+                        <CompareTableImage
                           src={caseItem.image_url}
                           alt={caseItem.name}
-                          aspectClassName="aspect-square w-20"
                         />
                       ) : (
                         <span className="text-gray-400">—</span>
