@@ -19,6 +19,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Phone Case Compare",
   description: "スマホケースを比較するサイト",
+  verification: {
+    google: "LXnGM94kDLw16JNHb1gAN7f7R8PM7OV8iyX9kZhh2pw",
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
