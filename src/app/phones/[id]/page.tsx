@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { ProductImage } from "@/components/ProductImage";
+import { CaseListWithCompare } from "@/components/CaseListWithCompare";
 import { supabase } from "@/lib/supabase";
 import type { Case, Phone } from "@/types/database";
 
@@ -41,10 +41,6 @@ async function getCases(phoneId: string): Promise<Case[]> {
   }
 
   return data ?? [];
-}
-
-function formatPrice(price: number): string {
-  return `¥${price.toLocaleString("ja-JP")}`;
 }
 
 export default async function PhoneDetailPage({ params }: PageProps) {
@@ -98,45 +94,7 @@ export default async function PhoneDetailPage({ params }: PageProps) {
           </p>
 
           {cases.length > 0 ? (
-            <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {cases.map((caseItem) => (
-                <li
-                  key={caseItem.id}
-                  className="flex min-h-[14rem] flex-col rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition-all hover:border-orange-300 hover:shadow-md"
-                >
-                  {caseItem.image_url ? (
-                    <ProductImage
-                      src={caseItem.image_url}
-                      alt={caseItem.name}
-                      aspectClassName="aspect-square"
-                    />
-                  ) : null}
-                  <h3 className="mb-2 text-lg font-medium tracking-tight text-gray-900">
-                    {caseItem.name}
-                  </h3>
-                  <dl className="mb-4 space-y-1 text-sm text-gray-600">
-                    <div className="flex gap-2">
-                      <dt className="font-medium text-gray-500">ブランド</dt>
-                      <dd>{caseItem.brand}</dd>
-                    </div>
-                    <div className="flex gap-2">
-                      <dt className="font-medium text-gray-500">価格</dt>
-                      <dd className="font-medium tracking-tight">
-                        {formatPrice(caseItem.price)}
-                      </dd>
-                    </div>
-                  </dl>
-                  <a
-                    href={caseItem.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-block text-sm font-medium text-orange-500 underline-offset-2 transition-colors hover:text-orange-600 hover:underline"
-                  >
-                    購入先を見る →
-                  </a>
-                </li>
-              ))}
-            </ul>
+            <CaseListWithCompare cases={cases} />
           ) : (
             <p className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-8 text-center text-gray-600">
               対応ケースがまだ登録されていません
