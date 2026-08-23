@@ -20,6 +20,28 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Phone Case Compare",
   description: "スマホケースを比較するサイト",
+  openGraph: {
+    title: "Phone Case Compare",
+    description: "スマホケースを比較するサイト",
+    url: "https://smartphone-case-comp-site.vercel.app",
+    siteName: "Phone Case Compare",
+    images: [
+      {
+        url: "/images/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Phone Case Compare",
+      },
+    ],
+    locale: "ja_JP",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Phone Case Compare",
+    description: "スマホケースを比較するサイト",
+    images: ["/images/og-image.png"],
+  },
   verification: {
     google: "LXnGM94kDLw16JNHb1gAN7f7R8PM7OV8iyX9kZhh2pw",
   },
