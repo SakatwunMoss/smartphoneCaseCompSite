@@ -3,7 +3,7 @@ import Link from "next/link";
 const FOOTER_LINKS = [
   { href: "/", label: "ホーム" },
   { href: "/columns", label: "コラム" },
-  { href: "/about", label: "について" },
+  { href: "/about", label: "サイトについて" },
   { href: "/privacy-policy", label: "プライバシーポリシー" },
   { href: "/contact", label: "お問い合わせ" },
 ] as const;
