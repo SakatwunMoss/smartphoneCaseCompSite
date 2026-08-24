@@ -1,10 +1,13 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 
-export const metadata: Metadata = {
+import { buildPageMetadata } from "@/lib/metadata";
+
+export const metadata: Metadata = buildPageMetadata({
   title: "運営者情報 | Phone Case Compare",
   description: "Phone Case Compareの運営者情報",
-};
+  path: "/about",
+});
 
 export default function AboutPage() {
   return (

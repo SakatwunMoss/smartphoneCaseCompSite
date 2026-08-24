@@ -1,33 +1,36 @@
 export const dynamic = "force-dynamic";
+
 import Image from "next/image";
 import Link from "next/link";
+import { Suspense } from "react";
+import type { Metadata } from "next";
 
+import { PhoneFilterPanel } from "@/components/PhoneFilterPanel";
 import { ProductImage } from "@/components/ProductImage";
 import { columns } from "@/lib/columns";
-import { supabase } from "@/lib/supabase";
-import type { Phone } from "@/types/database";
+import { buildPageMetadata } from "@/lib/metadata";
+import { parsePhoneFilters } from "@/lib/phone-filters";
+import { getPhoneFilterOptions, getPhones } from "@/lib/phones";
 
 const featuredColumns = columns.slice(0, 3);
 
-async function getPhones(): Promise<{
-  phones: Phone[] | null;
-  error: string | null;
-}> {
-  const { data, error } = await supabase
-    .from("phones")
-    .select("*")
-    .order("released_year", { ascending: false });
+export const metadata: Metadata = buildPageMetadata({
+  title: "Phone Case Compare",
+  description: "スマホケースを比較するサイト",
+  path: "/",
+});
 
-  if (error) {
-    console.error("Failed to fetch phones:", error);
-    return { phones: null, error: error.message };
-  }
+type HomeProps = {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+};
 
-  return { phones: data ?? [], error: null };
-}
-
-export default async function Home() {
-  const { phones, error } = await getPhones();
+export default async function Home({ searchParams }: HomeProps) {
+  const params = await searchParams;
+  const filters = parsePhoneFilters(params);
+  const [{ phones, error }, { makers, years }] = await Promise.all([
+    getPhones(filters),
+    getPhoneFilterOptions(),
+  ]);
 
   return (
     <div className="flex flex-1 flex-col">
@@ -53,6 +56,18 @@ export default async function Home() {
 
       <div className="px-6 py-10">
         <main className="mx-auto w-full max-w-6xl">
+          <Suspense
+            fallback={
+              <div className="mb-6 h-40 animate-pulse rounded-xl border border-gray-200 bg-gray-50" />
+            }
+          >
+            <PhoneFilterPanel
+              makers={makers}
+              years={years}
+              initialFilters={{ makers: [], year: "", sort: "year_desc" }}
+            />
+          </Suspense>
+
           {error ? (
             <p className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-red-700">
               データの取得に失敗しました。しばらくしてから再度お試しください。
@@ -88,7 +103,9 @@ export default async function Home() {
               ))}
             </ul>
           ) : (
-            <p className="text-gray-600">データがありません</p>
+            <p className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-8 text-center text-gray-600">
+              条件に一致する端末がありません
+            </p>
           )}
 
           <section

@@ -2,11 +2,13 @@ import Link from "next/link";
 import type { Metadata } from "next";
 
 import { columns } from "@/lib/columns";
+import { buildPageMetadata } from "@/lib/metadata";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildPageMetadata({
   title: "コラム | Phone Case Compare",
   description: "スマホケース選びに関するコラム記事一覧",
-};
+  path: "/columns",
+});
 
 export default function ColumnsPage() {
   return (

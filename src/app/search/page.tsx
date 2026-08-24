@@ -1,7 +1,9 @@
 export const dynamic = "force-dynamic";
 
 import Link from "next/link";
+import type { Metadata } from "next";
 
+import { buildPageMetadata } from "@/lib/metadata";
 import { supabase } from "@/lib/supabase";
 import type { Case, Phone } from "@/types/database";
 
@@ -12,6 +14,26 @@ type CaseWithPhone = Case & {
 type PageProps = {
   searchParams: Promise<{ q?: string | string[] }>;
 };
+
+export async function generateMetadata({
+  searchParams,
+}: PageProps): Promise<Metadata> {
+  const keyword = getQuery((await searchParams).q);
+
+  if (!keyword) {
+    return buildPageMetadata({
+      title: "検索 | Phone Case Compare",
+      description: "端末名・ケース名でスマホケースを検索",
+      path: "/search",
+    });
+  }
+
+  return buildPageMetadata({
+    title: `「${keyword}」の検索結果 | Phone Case Compare`,
+    description: `「${keyword}」に一致する端末・ケースの検索結果`,
+    path: `/search?q=${encodeURIComponent(keyword)}`,
+  });
+}
 
 function getQuery(q: string | string[] | undefined): string {
   if (Array.isArray(q)) {

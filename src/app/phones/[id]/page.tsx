@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 
 import { CaseListWithCompare } from "@/components/CaseListWithCompare";
 import { PhoneDescription } from "@/components/PhoneDescription";
+import { buildPageMetadata } from "@/lib/metadata";
 import { supabase } from "@/lib/supabase";
 import type { Case, Phone } from "@/types/database";
 
@@ -52,13 +53,17 @@ export async function generateMetadata({
   const phone = await getPhone(id);
 
   if (!phone) {
-    return { title: "機種が見つかりません | Phone Case Compare" };
+    return buildPageMetadata({
+      title: "機種が見つかりません | Phone Case Compare",
+      description: "指定された機種は見つかりませんでした。",
+    });
   }
 
-  return {
+  return buildPageMetadata({
     title: `${phone.name}対応ケースまとめ | Phone Case Compare`,
     description: `${phone.name}に対応するスマホケースを比較。耐衝撃・手帳型などタイプ別に厳選したおすすめケースを紹介します。`,
-  };
+    path: `/phones/${id}`,
+  });
 }
 
 export default async function PhoneDetailPage({ params }: PageProps) {

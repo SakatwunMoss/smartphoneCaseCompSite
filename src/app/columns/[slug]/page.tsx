@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { columns, getColumnBySlug } from "@/lib/columns";
+import { buildPageMetadata } from "@/lib/metadata";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -19,13 +20,17 @@ export async function generateMetadata({
   const column = getColumnBySlug(slug);
 
   if (!column) {
-    return { title: "記事が見つかりません | Phone Case Compare" };
+    return buildPageMetadata({
+      title: "記事が見つかりません | Phone Case Compare",
+      description: "指定された記事は見つかりませんでした。",
+    });
   }
 
-  return {
+  return buildPageMetadata({
     title: `${column.title} | Phone Case Compare`,
     description: column.excerpt,
-  };
+    path: `/columns/${slug}`,
+  });
 }
 
 export default async function ColumnDetailPage({ params }: PageProps) {

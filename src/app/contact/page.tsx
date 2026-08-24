@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { buildPageMetadata } from "@/lib/metadata";
 import { ContactForm } from "./ContactForm";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildPageMetadata({
   title: "お問い合わせ | Phone Case Compare",
   description: "Phone Case Compareへのお問い合わせ",
-};
+  path: "/contact",
+});
 
 export default function ContactPage() {
   return (
