@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { ProductImage } from "@/components/ProductImage";
 import type { Case } from "@/types/database";
@@ -38,6 +38,7 @@ function CompareTableImage({ src, alt }: { src: string; alt: string }) {
 export function CaseListWithCompare({ cases }: CaseListWithCompareProps) {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [showCompare, setShowCompare] = useState(false);
+  const compareTableRef = useRef<HTMLElement>(null);
 
   const selectedCount = selectedIds.size;
   const isMaxSelected = selectedCount >= MAX_SELECTION;
@@ -68,12 +69,22 @@ export function CaseListWithCompare({ cases }: CaseListWithCompareProps) {
     }
   }
 
+  useEffect(() => {
+    if (showCompare) {
+      compareTableRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }
+  }, [showCompare]);
+
   return (
     <>
       {showCompare && canCompare ? (
         <section
+          ref={compareTableRef}
           aria-labelledby="compare-heading"
-          className="mb-6 rounded-xl border border-orange-200 bg-white p-4 shadow-sm sm:p-6"
+          className="mb-6 scroll-mt-24 rounded-xl border border-orange-200 bg-white p-4 shadow-sm sm:p-6"
         >
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
             <h3
