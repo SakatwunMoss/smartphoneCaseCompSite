@@ -1,34 +1,17 @@
 export const dynamic = "force-dynamic";
 
 import Link from "next/link";
+import { Suspense } from "react";
 import type { Metadata } from "next";
 
+import { CaseSearchResults } from "@/components/CaseSearchResults";
+import type { CaseSearchItem } from "@/lib/case-search-filters";
 import { buildPageMetadata } from "@/lib/metadata";
 import { supabase } from "@/lib/supabase";
 import type { Case, MarketplaceOffer, Phone } from "@/types/database";
 
-type CaseSource = "other" | "rakuten" | "yahoo";
-
-type CaseSearchResult = {
-  id: string;
-  name: string;
-  brand: string | null;
-  price: number;
-  phone_id: string;
-  phone_name: string | null;
-  source: CaseSource;
-  /** 外部ショップの商品ページURL。無い場合は機種詳細へフォールバック */
-  url: string | null;
-};
-
 type PageProps = {
   searchParams: Promise<{ q?: string | string[] }>;
-};
-
-const SOURCE_LABEL: Record<CaseSource, string> = {
-  other: "その他",
-  rakuten: "楽天市場",
-  yahoo: "Yahoo!ショッピング",
 };
 
 export async function generateMetadata({
@@ -58,10 +41,6 @@ function getQuery(q: string | string[] | undefined): string {
   return q?.trim() ?? "";
 }
 
-function formatPrice(price: number): string {
-  return `¥${price.toLocaleString("ja-JP")}`;
-}
-
 async function searchPhones(keyword: string): Promise<Phone[]> {
   const { data, error } = await supabase
     .from("phones")
@@ -76,7 +55,7 @@ async function searchPhones(keyword: string): Promise<Phone[]> {
   return data ?? [];
 }
 
-async function searchOtherCases(keyword: string): Promise<CaseSearchResult[]> {
+async function searchOtherCases(keyword: string): Promise<CaseSearchItem[]> {
   type CaseRow = Case & {
     phones: Pick<Phone, "name"> | null;
   };
@@ -100,12 +79,13 @@ async function searchOtherCases(keyword: string): Promise<CaseSearchResult[]> {
     phone_name: row.phones?.name ?? null,
     source: "other" as const,
     url: row.url?.trim() || null,
+    review_rate: null,
   }));
 }
 
 async function searchMarketplaceOffers(
   keyword: string,
-): Promise<CaseSearchResult[]> {
+): Promise<CaseSearchItem[]> {
   type OfferRow = MarketplaceOffer & {
     phones: Pick<Phone, "name"> | null;
   };
@@ -129,43 +109,12 @@ async function searchMarketplaceOffers(
     phone_name: row.phones?.name ?? null,
     source: row.source,
     url: row.url?.trim() || null,
+    review_rate: row.review_rate,
   }));
 }
 
 function caseCardClassName(): string {
   return "block rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition-all hover:border-orange-300 hover:shadow-md";
-}
-
-function CaseCardContent({ item }: { item: CaseSearchResult }) {
-  return (
-    <>
-      <h3 className="mb-2 text-lg font-medium tracking-tight text-gray-900">
-        {item.name}
-      </h3>
-      <dl className="space-y-1 text-sm text-gray-600">
-        {item.brand ? (
-          <div className="flex gap-2">
-            <dt className="font-medium text-gray-500">ブランド</dt>
-            <dd>{item.brand}</dd>
-          </div>
-        ) : null}
-        <div className="flex gap-2">
-          <dt className="font-medium text-gray-500">価格</dt>
-          <dd className="font-medium tracking-tight">
-            {formatPrice(item.price)}
-          </dd>
-        </div>
-        <div className="flex gap-2">
-          <dt className="font-medium text-gray-500">端末</dt>
-          <dd>{item.phone_name ?? "—"}</dd>
-        </div>
-        <div className="flex gap-2">
-          <dt className="font-medium text-gray-500">店舗</dt>
-          <dd>{SOURCE_LABEL[item.source]}</dd>
-        </div>
-      </dl>
-    </>
-  );
 }
 
 export default async function SearchPage({ searchParams }: PageProps) {
@@ -245,46 +194,13 @@ export default async function SearchPage({ searchParams }: PageProps) {
             )}
 
             {cases.length > 0 && (
-              <section aria-labelledby="cases-heading">
-                <div className="mb-4">
-                  <h2
-                    id="cases-heading"
-                    className="text-xl font-medium text-gray-900"
-                  >
-                    ケース
-                  </h2>
-                  <p className="mt-1 text-sm text-gray-500">
-                    商品をクリックすると、各ショップの販売ページへ移動します
-                  </p>
-                </div>
-                <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                  {cases.map((caseItem) => (
-                    <li key={`${caseItem.source}-${caseItem.id}`}>
-                      {caseItem.url ? (
-                        <a
-                          href={caseItem.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className={caseCardClassName()}
-                        >
-                          <CaseCardContent item={caseItem} />
-                        </a>
-                      ) : (
-                        <Link
-                          href={`/phones/${caseItem.phone_id}${
-                            caseItem.source === "rakuten"
-                              ? ""
-                              : `?source=${caseItem.source}`
-                          }`}
-                          className={caseCardClassName()}
-                        >
-                          <CaseCardContent item={caseItem} />
-                        </Link>
-                      )}
-                    </li>
-                  ))}
-                </ul>
-              </section>
+              <Suspense
+                fallback={
+                  <div className="h-40 animate-pulse rounded-xl border border-gray-200 bg-gray-50" />
+                }
+              >
+                <CaseSearchResults keyword={keyword} cases={cases} />
+              </Suspense>
             )}
           </div>
         )}
