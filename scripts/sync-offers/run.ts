@@ -73,6 +73,7 @@ async function main() {
   const serviceRoleKey = requireEnv("SUPABASE_SERVICE_ROLE_KEY");
   requireEnv("RAKUTEN_APP_ID");
   requireEnv("RAKUTEN_ACCESS_KEY");
+  requireEnv("RAKUTEN_AFFILIATE_ID");
   requireEnv("YAHOO_CLIENT_ID");
 
   const supabase = createClient(supabaseUrl, serviceRoleKey);

@@ -32,6 +32,7 @@ interface RakutenItem {
   shopName?: string;
   itemPrice?: number;
   itemUrl?: string;
+  affiliateUrl?: string;
   mediumImageUrls?: RakutenImageUrl[];
   reviewCount?: number;
   reviewAverage?: number;
@@ -61,11 +62,12 @@ function upgradeRakutenImageUrl(url: string): string {
 }
 
 function mapItem(item: RakutenItem): MarketplaceOffer | null {
+  const url = item.affiliateUrl || item.itemUrl;
   if (
     !item.itemCode ||
     !item.itemName ||
     item.itemPrice == null ||
-    !item.itemUrl
+    !url
   ) {
     return null;
   }
@@ -82,7 +84,7 @@ function mapItem(item: RakutenItem): MarketplaceOffer | null {
     name: item.itemName,
     brand: item.shopName ?? null,
     price: item.itemPrice,
-    url: item.itemUrl,
+    url,
     image_url: rawImage ? upgradeRakutenImageUrl(rawImage) : null,
     review_count: item.reviewCount ?? null,
     review_rate: item.reviewAverage ?? null,
@@ -105,13 +107,20 @@ function getCredentials() {
     );
   }
 
+  const affiliateId = process.env.RAKUTEN_AFFILIATE_ID;
+  if (!affiliateId) {
+    throw new Error(
+      "RAKUTEN_AFFILIATE_ID が設定されていません。.env.local を確認してください。",
+    );
+  }
+
   const referer = (process.env.RAKUTEN_REFERER || DEFAULT_REFERER).replace(
     /\/?$/,
     "/",
   );
   const origin = referer.replace(/\/$/, "");
 
-  return { applicationId, accessKey, referer, origin };
+  return { applicationId, accessKey, affiliateId, referer, origin };
 }
 
 function sleep(ms: number): Promise<void> {
@@ -131,11 +140,13 @@ async function fetchPage(
   page: number,
   attempt = 1,
 ): Promise<MarketplaceOffer[]> {
-  const { applicationId, accessKey, referer, origin } = getCredentials();
+  const { applicationId, accessKey, affiliateId, referer, origin } =
+    getCredentials();
 
   const params = new URLSearchParams({
     applicationId,
     accessKey,
+    affiliateId,
     keyword,
     genreId: GENRE_ID,
     hits: "30",
