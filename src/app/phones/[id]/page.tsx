@@ -1,12 +1,13 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { notFound } from "next/navigation";
 
-import { CaseListWithCompare } from "@/components/CaseListWithCompare";
+import { CaseSourceTabs } from "@/components/CaseSourceTabs";
 import { PhoneDescription } from "@/components/PhoneDescription";
 import { buildPageMetadata } from "@/lib/metadata";
 import { supabase } from "@/lib/supabase";
-import type { Case, Phone } from "@/types/database";
+import type { Case, MarketplaceOffer, Phone } from "@/types/database";
 
 type PageProps = {
   params: Promise<{ id: string }>;
@@ -31,12 +32,12 @@ async function getPhone(id: string): Promise<PhoneDetail | null> {
   return data as PhoneDetail | null;
 }
 
-async function getCases(phoneId: string): Promise<Case[]> {
+async function getYodobashiCases(phoneId: string): Promise<Case[]> {
   const { data, error } = await supabase
     .from("cases")
     .select("*")
     .eq("phone_id", phoneId)
-    .order("created_at", { ascending: true });
+    .order("price", { ascending: true });
 
   if (error) {
     console.error("Failed to fetch cases:", error);
@@ -44,6 +45,25 @@ async function getCases(phoneId: string): Promise<Case[]> {
   }
 
   return data ?? [];
+}
+
+async function getMarketplaceOffers(
+  phoneId: string,
+  source: "rakuten" | "yahoo",
+): Promise<MarketplaceOffer[]> {
+  const { data, error } = await supabase
+    .from("marketplace_offers")
+    .select("*")
+    .eq("phone_id", phoneId)
+    .eq("source", source)
+    .order("price", { ascending: true });
+
+  if (error) {
+    console.error(`Failed to fetch ${source} offers:`, error);
+    return [];
+  }
+
+  return (data ?? []) as MarketplaceOffer[];
 }
 
 export async function generateMetadata({
@@ -66,6 +86,23 @@ export async function generateMetadata({
   });
 }
 
+function CaseSourceTabsFallback() {
+  return (
+    <div className="animate-pulse space-y-4">
+      <div className="flex gap-2 border-b border-gray-200 pb-2">
+        <div className="h-9 w-28 rounded bg-gray-100" />
+        <div className="h-9 w-32 rounded bg-gray-100" />
+        <div className="h-9 w-40 rounded bg-gray-100" />
+      </div>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="h-56 rounded-xl bg-gray-100" />
+        <div className="h-56 rounded-xl bg-gray-100" />
+        <div className="h-56 rounded-xl bg-gray-100" />
+      </div>
+    </div>
+  );
+}
+
 export default async function PhoneDetailPage({ params }: PageProps) {
   const { id } = await params;
   const phone = await getPhone(id);
@@ -74,7 +111,11 @@ export default async function PhoneDetailPage({ params }: PageProps) {
     notFound();
   }
 
-  const cases = await getCases(id);
+  const [yodobashiCases, rakutenOffers, yahooOffers] = await Promise.all([
+    getYodobashiCases(id),
+    getMarketplaceOffers(id, "rakuten"),
+    getMarketplaceOffers(id, "yahoo"),
+  ]);
 
   return (
     <div className="flex flex-1 flex-col px-6 py-10">
@@ -114,13 +155,13 @@ export default async function PhoneDetailPage({ params }: PageProps) {
             ※表示価格は変動する場合があります。購入の際は各販売元の最新価格をご確認ください。
           </p>
 
-          {cases.length > 0 ? (
-            <CaseListWithCompare cases={cases} />
-          ) : (
-            <p className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-8 text-center text-gray-600">
-              対応ケースがまだ登録されていません
-            </p>
-          )}
+          <Suspense fallback={<CaseSourceTabsFallback />}>
+            <CaseSourceTabs
+              yodobashiCases={yodobashiCases}
+              rakutenOffers={rakutenOffers}
+              yahooOffers={yahooOffers}
+            />
+          </Suspense>
         </section>
       </main>
     </div>
