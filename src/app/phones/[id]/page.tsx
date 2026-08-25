@@ -32,7 +32,7 @@ async function getPhone(id: string): Promise<PhoneDetail | null> {
   return data as PhoneDetail | null;
 }
 
-async function getYodobashiCases(phoneId: string): Promise<Case[]> {
+async function getOtherCases(phoneId: string): Promise<Case[]> {
   const { data, error } = await supabase
     .from("cases")
     .select("*")
@@ -111,8 +111,8 @@ export default async function PhoneDetailPage({ params }: PageProps) {
     notFound();
   }
 
-  const [yodobashiCases, rakutenOffers, yahooOffers] = await Promise.all([
-    getYodobashiCases(id),
+  const [otherCases, rakutenOffers, yahooOffers] = await Promise.all([
+    getOtherCases(id),
     getMarketplaceOffers(id, "rakuten"),
     getMarketplaceOffers(id, "yahoo"),
   ]);
@@ -157,7 +157,7 @@ export default async function PhoneDetailPage({ params }: PageProps) {
 
           <Suspense fallback={<CaseSourceTabsFallback />}>
             <CaseSourceTabs
-              yodobashiCases={yodobashiCases}
+              otherCases={otherCases}
               rakutenOffers={rakutenOffers}
               yahooOffers={yahooOffers}
             />

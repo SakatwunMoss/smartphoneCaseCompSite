@@ -7,25 +7,32 @@ import { CaseListWithCompare } from "@/components/CaseListWithCompare";
 import { ProductImage } from "@/components/ProductImage";
 import type { Case, MarketplaceOffer } from "@/types/database";
 
-export type CaseSource = "yodobashi" | "rakuten" | "yahoo";
+// "other" = cases テーブル由来（旧 yodobashi）。複数ショップが混在するため表示名は「その他」。
+// 互換: 旧ブックマーク ?source=yodobashi も other として解釈する。
+export type CaseSource = "other" | "rakuten" | "yahoo";
 
 type CaseSourceTabsProps = {
-  yodobashiCases: Case[];
+  otherCases: Case[];
   rakutenOffers: MarketplaceOffer[];
   yahooOffers: MarketplaceOffer[];
 };
 
 const TABS: { id: CaseSource; label: string }[] = [
-  { id: "yodobashi", label: "ヨドバシ" },
   { id: "rakuten", label: "楽天市場" },
   { id: "yahoo", label: "Yahoo!ショッピング" },
+  { id: "other", label: "その他" },
 ];
 
 function parseSource(value: string | null): CaseSource {
-  if (value === "rakuten" || value === "yahoo" || value === "yodobashi") {
+  if (value === "rakuten" || value === "yahoo" || value === "other") {
     return value;
   }
-  return "yodobashi";
+  // 旧クエリ値の互換（?source=yodobashi → その他）
+  if (value === "yodobashi") {
+    return "other";
+  }
+  // 初期表示は従来どおり cases（その他）タブをアクティブにする
+  return "other";
 }
 
 function formatPrice(price: number): string {
@@ -43,7 +50,7 @@ function ExternalLinkIcon({ className }: { className?: string }) {
     >
       <path
         fillRule="evenodd"
-        d="M4.25 5.5a.75.75 0 0 0-.75.75v8.5c0 .414.336.75.75.75h8.5a.75.75 0 0 0 .75-.75v-4a.75.75 0 0 1 1.5 0v4A2.25 2.25 0 0 1 12.75 17h-8.5A2.25 2.25 0 0 1 2 14.75v-8.5A2.25 2.25 0 0 1 4.25 4.5h4a.75.75 0 0 1 0 1.5h-4Z"
+        d="M4.25 5.5a.75.75 0 0 0-.75-.75v8.5c0 .414.336.75.75.75h8.5a.75.75 0 0 0 .75-.75v-4a.75.75 0 0 1 1.5 0v4A2.25 2.25 0 0 1 12.75 17h-8.5A2.25 2.25 0 0 1 2 14.75v-8.5A2.25 2.25 0 0 1 4.25 4.5h4a.75.75 0 0 1 0 1.5h-4Z"
         clipRule="evenodd"
       />
       <path
@@ -159,7 +166,7 @@ function MarketplaceOfferList({ offers }: { offers: MarketplaceOffer[] }) {
 }
 
 export function CaseSourceTabs({
-  yodobashiCases,
+  otherCases,
   rakutenOffers,
   yahooOffers,
 }: CaseSourceTabsProps) {
@@ -174,7 +181,7 @@ export function CaseSourceTabs({
   );
 
   const counts: Record<CaseSource, number> = {
-    yodobashi: yodobashiCases.length,
+    other: otherCases.length,
     rakuten: rakutenOffers.length,
     yahoo: yahooOffers.length,
   };
@@ -182,7 +189,8 @@ export function CaseSourceTabs({
   const setSource = useCallback(
     (source: CaseSource) => {
       const params = new URLSearchParams(searchParams.toString());
-      if (source === "yodobashi") {
+      // その他（旧 yodobashi）がデフォルトのためクエリは付けない
+      if (source === "other") {
         params.delete("source");
       } else {
         params.set("source", source);
@@ -233,9 +241,9 @@ export function CaseSourceTabs({
         id={`panel-${activeSource}`}
         aria-labelledby={`tab-${activeSource}`}
       >
-        {activeSource === "yodobashi" ? (
-          yodobashiCases.length > 0 ? (
-            <CaseListWithCompare cases={yodobashiCases} />
+        {activeSource === "other" ? (
+          otherCases.length > 0 ? (
+            <CaseListWithCompare cases={otherCases} />
           ) : (
             <EmptyState />
           )
