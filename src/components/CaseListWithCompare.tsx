@@ -1,5 +1,6 @@
 "use client";
 
+import { AffiliateBadge } from "@/components/AffiliateBadge";
 import { ProductImage } from "@/components/ProductImage";
 import { caseToComparable, type ComparableItem } from "@/lib/comparable";
 import type { Case } from "@/types/database";
@@ -71,15 +72,18 @@ export function CaseListWithCompare({
                   </dd>
                 </div>
               </dl>
-              <a
-                href={caseItem.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={(e) => e.stopPropagation()}
-                className="inline-block text-sm font-medium text-orange-500 underline-offset-2 transition-colors hover:text-orange-600 hover:underline"
-              >
-                購入先を見る →
-              </a>
+              <div className="flex items-center gap-2">
+                <AffiliateBadge />
+                <a
+                  href={caseItem.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(e) => e.stopPropagation()}
+                  className="inline-block text-sm font-medium text-orange-500 underline-offset-2 transition-colors hover:text-orange-600 hover:underline"
+                >
+                  購入先を見る →
+                </a>
+              </div>
             </label>
           </li>
         );

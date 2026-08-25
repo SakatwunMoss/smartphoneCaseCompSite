@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 
+import { AffiliateBadge } from "@/components/AffiliateBadge";
 import { CaseSearchFilterPanel } from "@/components/CaseSearchFilterPanel";
 import {
   CASE_SEARCH_SOURCE_LABEL,
@@ -31,9 +32,12 @@ function caseCardClassName(): string {
 function CaseCardContent({ item }: { item: CaseSearchItem }) {
   return (
     <>
-      <h3 className="mb-2 text-lg font-medium tracking-tight text-gray-900">
-        {item.name}
-      </h3>
+      <div className="mb-2 flex items-start justify-between gap-2">
+        <h3 className="text-lg font-medium tracking-tight text-gray-900">
+          {item.name}
+        </h3>
+        {item.url ? <AffiliateBadge /> : null}
+      </div>
       <dl className="space-y-1 text-sm text-gray-600">
         {item.brand ? (
           <div className="flex gap-2">

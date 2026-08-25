@@ -4,6 +4,7 @@ import { useCallback, useMemo, useState, useTransition } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import { CaseListWithCompare } from "@/components/CaseListWithCompare";
+import { AffiliateBadge } from "@/components/AffiliateBadge";
 import {
   CompareSelectionBar,
   CompareTable,
@@ -188,16 +189,19 @@ function MarketplaceOfferList({
                 ) : null}
               </dl>
 
-              <a
-                href={offer.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={(e) => e.stopPropagation()}
-                className="mt-auto inline-flex items-center gap-1 pt-3 text-sm font-medium text-orange-500 underline-offset-2 transition-colors hover:text-orange-600 hover:underline"
-              >
-                購入先を見る
-                <ExternalLinkIcon className="h-3.5 w-3.5" />
-              </a>
+              <div className="mt-auto flex items-center gap-2 pt-3">
+                <AffiliateBadge />
+                <a
+                  href={offer.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(e) => e.stopPropagation()}
+                  className="inline-flex items-center gap-1 text-sm font-medium text-orange-500 underline-offset-2 transition-colors hover:text-orange-600 hover:underline"
+                >
+                  購入先を見る
+                  <ExternalLinkIcon className="h-3.5 w-3.5" />
+                </a>
+              </div>
             </label>
           </li>
         );

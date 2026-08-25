@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 
+import { AffiliateBadge } from "@/components/AffiliateBadge";
 import type { ComparableItem } from "@/lib/comparable";
 
 function formatPrice(price: number): string {
@@ -204,14 +205,17 @@ export function CompareTable({ items, onClear }: CompareTableProps) {
               </th>
               {items.map((item) => (
                 <td key={item.id} className="px-3 py-4 align-top">
-                  <a
-                    href={item.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-block font-medium text-orange-500 underline-offset-2 transition-colors hover:text-orange-600 hover:underline"
-                  >
-                    購入先を見る →
-                  </a>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <AffiliateBadge />
+                    <a
+                      href={item.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-block font-medium text-orange-500 underline-offset-2 transition-colors hover:text-orange-600 hover:underline"
+                    >
+                      購入先を見る →
+                    </a>
+                  </div>
                 </td>
               ))}
             </tr>

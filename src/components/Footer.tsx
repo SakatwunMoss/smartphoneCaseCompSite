@@ -5,6 +5,7 @@ const FOOTER_LINKS = [
   { href: "/columns", label: "コラム" },
   { href: "/about", label: "サイトについて" },
   { href: "/privacy-policy", label: "プライバシーポリシー" },
+  { href: "/tokushoho", label: "特定商取引法に基づく表記" },
   { href: "/contact", label: "お問い合わせ" },
 ] as const;
 
@@ -38,9 +39,12 @@ export function Footer() {
           </nav>
         </div>
 
-        <p className="border-t border-gray-200 pt-4 text-xs text-gray-500">
-          © 2026 Phone Case Compare
-        </p>
+        <div className="space-y-2 border-t border-gray-200 pt-4">
+          <p className="text-xs text-gray-500">
+            本サイトはアフィリエイト広告を利用しています
+          </p>
+          <p className="text-xs text-gray-500">© 2026 Phone Case Compare</p>
+        </div>
       </div>
     </footer>
   );
