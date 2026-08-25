@@ -9,7 +9,10 @@
     "lint": "eslint",
     "fetch-images": "tsx --env-file=.env.local scripts/fetch-og-images.ts",
     "preview-images": "tsx --env-file=.env.local scripts/preview-og-images.ts",
-    "apply-images": "tsx --env-file=.env.local scripts/apply-og-images.ts"
+    "apply-images": "tsx --env-file=.env.local scripts/apply-og-images.ts",
+    "test:rakuten": "tsx --env-file=.env.local scripts/api-test/rakuten-test.ts",
+    "test:yahoo": "tsx --env-file=.env.local scripts/api-test/yahoo-test.ts",
+    "sync:offers": "tsx --env-file=.env.local scripts/sync-offers/run.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.112.3",
