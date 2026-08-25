@@ -40,8 +40,8 @@ function parseSource(value: string | null): CaseSource {
   if (value === "yodobashi") {
     return "other";
   }
-  // 初期表示は従来どおり cases（その他）タブをアクティブにする
-  return "other";
+  // クエリ未指定時は楽天市場を初期選択
+  return "rakuten";
 }
 
 function formatPrice(price: number): string {
@@ -272,8 +272,8 @@ export function CaseSourceTabs({
   const setSource = useCallback(
     (source: CaseSource) => {
       const params = new URLSearchParams(searchParams.toString());
-      // その他（旧 yodobashi）がデフォルトのためクエリは付けない
-      if (source === "other") {
+      // 楽天がデフォルトのためクエリは付けない
+      if (source === "rakuten") {
         params.delete("source");
       } else {
         params.set("source", source);

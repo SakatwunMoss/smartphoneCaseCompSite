@@ -272,7 +272,7 @@ export default async function SearchPage({ searchParams }: PageProps) {
                       ) : (
                         <Link
                           href={`/phones/${caseItem.phone_id}${
-                            caseItem.source === "other"
+                            caseItem.source === "rakuten"
                               ? ""
                               : `?source=${caseItem.source}`
                           }`}
