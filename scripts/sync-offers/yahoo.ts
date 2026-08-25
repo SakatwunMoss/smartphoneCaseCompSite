@@ -114,12 +114,9 @@ async function fetchPage(
     params.set("genre_category_id", IPHONE_CASE_GENRE_ID);
   }
 
-  const response = await fetch(`${ENDPOINT}?${params.toString()}`, {
-    // Yahoo API は User-Agent に AppID を付ける公式サンプルがある
-    headers: {
-      "User-Agent": `Yahoo AppID: ${clientId}`,
-    },
-  });
+  // appid はクエリのみ。User-Agent に AppID を重ねると
+  // 「Authentication parameters ... conflicted」(401) になる
+  const response = await fetch(`${ENDPOINT}?${params.toString()}`);
 
   let data: YahooSearchResponse;
   try {
@@ -144,12 +141,11 @@ async function fetchPage(
       data.Message ||
       JSON.stringify(data);
 
-    if (response.status === 403) {
+    if (response.status === 403 || response.status === 401) {
       throw new Error(
-        `Yahoo APIエラー (HTTP 403): ${desc}\n` +
-          `  → YAHOO_CLIENT_ID が無効、または「アプリケーションID」ではなく別の値（シークレット等）が入っている可能性があります。\n` +
-          `  → Yahoo!デベロッパーネットワークで発行した Client ID（多くの場合 dj0y で始まる）を .env.local に設定し直してください。\n` +
-          `  → 確認: npm run test:yahoo`,
+        `Yahoo APIエラー (HTTP ${response.status}): ${desc}\n` +
+          `  → YAHOO_CLIENT_ID に「アプリケーションID」（多くは dj0y 始まり）だけを設定してください。\n` +
+          `  → シークレットや access_token を混ぜないこと。確認: npm run test:yahoo`,
       );
     }
 
@@ -171,11 +167,18 @@ async function fetchPage(
  * キーワードでYahoo!ショッピングを検索し、ケース商品を最大60件返す。
  * iPhone系キーワードの場合は genre_category_id=49333 で絞り込む。
  */
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
+
 export async function fetchYahooOffers(
   keyword: string,
 ): Promise<MarketplaceOffer[]> {
-  // 連続リクエストで 403/429 になりやすいため、ページは直列で取得
+  // 1クエリ/秒の制限を意識してページは直列＋間隔
   const page1 = await fetchPage(keyword, 1);
+  await sleep(1100);
   const page2 = await fetchPage(keyword, 31);
 
   const seen = new Set<string>();

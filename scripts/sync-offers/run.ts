@@ -110,29 +110,27 @@ async function main() {
     const keyword = `${phone.name} ケース`;
 
     try {
-      // 片方のAPIが失敗しても、もう片方の結果は保存する
-      const [rakutenResult, yahooResult] = await Promise.allSettled([
-        fetchRakutenOffers(keyword),
-        fetchYahooOffers(keyword),
-      ]);
+      // レート制限回避のため楽天→Yahoo を直列実行（片方失敗しても他方は保存）
+      let rakutenOffers: Awaited<ReturnType<typeof fetchRakutenOffers>> = [];
+      let yahooOffers: Awaited<ReturnType<typeof fetchYahooOffers>> = [];
+      let rakutenFailed = false;
+      let yahooFailed = false;
 
-      const rakutenOffers =
-        rakutenResult.status === "fulfilled" ? rakutenResult.value : [];
-      const yahooOffers =
-        yahooResult.status === "fulfilled" ? yahooResult.value : [];
-
-      if (rakutenResult.status === "rejected") {
-        const msg =
-          rakutenResult.reason instanceof Error
-            ? rakutenResult.reason.message
-            : String(rakutenResult.reason);
+      try {
+        rakutenOffers = await fetchRakutenOffers(keyword);
+      } catch (err) {
+        rakutenFailed = true;
+        const msg = err instanceof Error ? err.message : String(err);
         console.error(`${phone.name}: 楽天エラー — ${msg}`);
       }
-      if (yahooResult.status === "rejected") {
-        const msg =
-          yahooResult.reason instanceof Error
-            ? yahooResult.reason.message
-            : String(yahooResult.reason);
+
+      await sleep(500);
+
+      try {
+        yahooOffers = await fetchYahooOffers(keyword);
+      } catch (err) {
+        yahooFailed = true;
+        const msg = err instanceof Error ? err.message : String(err);
         console.error(`${phone.name}: Yahooエラー — ${msg}`);
       }
 
@@ -162,11 +160,7 @@ async function main() {
         }
       }
 
-      // 両方のAPIが失敗した場合のみ機種単位の失敗とする
-      if (
-        rakutenResult.status === "rejected" &&
-        yahooResult.status === "rejected"
-      ) {
+      if (rakutenFailed && yahooFailed) {
         errorCount += 1;
       } else {
         successCount += 1;
@@ -183,9 +177,9 @@ async function main() {
       console.error(`${phone.name}: エラー — ${message}`);
     }
 
-    // レート制限対策: 最後の機種以外は1秒待機
+    // レート制限対策: 機種間は2秒待機
     if (i < phones.length - 1) {
-      await sleep(1000);
+      await sleep(2000);
     }
   }
 

@@ -104,9 +104,22 @@ function getCredentials() {
   return { applicationId, accessKey, referer, origin };
 }
 
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
+
+function parseRetryAfterSeconds(message: string): number {
+  const match = message.match(/Try again in (\d+) seconds?/i);
+  if (match) return Number(match[1]);
+  return 1;
+}
+
 async function fetchPage(
   keyword: string,
   page: number,
+  attempt = 1,
 ): Promise<MarketplaceOffer[]> {
   const { applicationId, accessKey, referer, origin } = getCredentials();
 
@@ -128,11 +141,23 @@ async function fetchPage(
     },
   });
 
-  let data: RakutenSearchResponse;
+  let data: RakutenSearchResponse & { statusCode?: number; message?: string };
   try {
-    data = (await response.json()) as RakutenSearchResponse;
+    data = (await response.json()) as RakutenSearchResponse & {
+      statusCode?: number;
+      message?: string;
+    };
   } catch {
     throw new Error(`楽天APIのJSONパースに失敗しました (HTTP ${response.status})`);
+  }
+
+  // レート制限: 指定秒数待ってリトライ（最大3回）
+  if (response.status === 429 && attempt < 3) {
+    const waitSec = parseRetryAfterSeconds(
+      data.message || JSON.stringify(data),
+    );
+    await sleep((waitSec + 1) * 1000);
+    return fetchPage(keyword, page, attempt + 1);
   }
 
   if (!response.ok || data.error || data.errors) {
@@ -140,6 +165,7 @@ async function fetchPage(
       data.errors?.errorMessage ||
       data.error_description ||
       data.error ||
+      data.message ||
       JSON.stringify(data);
     throw new Error(`楽天APIエラー (HTTP ${response.status}): ${desc}`);
   }
@@ -162,8 +188,9 @@ async function fetchPage(
 export async function fetchRakutenOffers(
   keyword: string,
 ): Promise<MarketplaceOffer[]> {
-  // 連続リクエストでレート制限にかかりやすいため、ページは直列で取得
+  // ページ間に間隔を空けて 429 を回避
   const page1 = await fetchPage(keyword, 1);
+  await sleep(1200);
   const page2 = await fetchPage(keyword, 2);
 
   // item_code で重複排除（ページまたぎで同じ商品が返ることがある）
