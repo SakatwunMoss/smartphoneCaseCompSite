@@ -6,12 +6,15 @@ type ProductImageProps = {
   src: string;
   alt: string;
   aspectClassName?: string;
+  /** object-fit。商品サムネはデフォルト cover */
+  objectFit?: "cover" | "contain";
 };
 
 export function ProductImage({
   src,
   alt,
   aspectClassName = "aspect-video",
+  objectFit = "cover",
 }: ProductImageProps) {
   const [failed, setFailed] = useState(false);
 
@@ -27,7 +30,7 @@ export function ProductImage({
       <img
         src={src}
         alt={alt}
-        className="h-full w-full object-cover"
+        className={`h-full w-full ${objectFit === "contain" ? "object-contain" : "object-cover"}`}
         onError={() => setFailed(true)}
       />
     </div>

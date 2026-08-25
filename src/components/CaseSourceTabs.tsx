@@ -107,7 +107,8 @@ function MarketplaceOfferList({ offers }: { offers: MarketplaceOffer[] }) {
                 <ProductImage
                   src={offer.image_url}
                   alt={offer.name}
-                  aspectClassName="aspect-square"
+                  aspectClassName="aspect-square mx-auto w-3/4"
+                  objectFit="contain"
                 />
               ) : null}
 

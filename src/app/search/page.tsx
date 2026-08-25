@@ -5,14 +5,28 @@ import type { Metadata } from "next";
 
 import { buildPageMetadata } from "@/lib/metadata";
 import { supabase } from "@/lib/supabase";
-import type { Case, Phone } from "@/types/database";
+import type { Case, MarketplaceOffer, Phone } from "@/types/database";
 
-type CaseWithPhone = Case & {
-  phones: Pick<Phone, "name"> | null;
+type CaseSource = "yodobashi" | "rakuten" | "yahoo";
+
+type CaseSearchResult = {
+  id: string;
+  name: string;
+  brand: string | null;
+  price: number;
+  phone_id: string;
+  phone_name: string | null;
+  source: CaseSource;
 };
 
 type PageProps = {
   searchParams: Promise<{ q?: string | string[] }>;
+};
+
+const SOURCE_LABEL: Record<CaseSource, string> = {
+  yodobashi: "ヨドバシ",
+  rakuten: "楽天市場",
+  yahoo: "Yahoo!ショッピング",
 };
 
 export async function generateMetadata({
@@ -60,7 +74,13 @@ async function searchPhones(keyword: string): Promise<Phone[]> {
   return data ?? [];
 }
 
-async function searchCases(keyword: string): Promise<CaseWithPhone[]> {
+async function searchYodobashiCases(
+  keyword: string,
+): Promise<CaseSearchResult[]> {
+  type CaseRow = Case & {
+    phones: Pick<Phone, "name"> | null;
+  };
+
   const { data, error } = await supabase
     .from("cases")
     .select("*, phones(name)")
@@ -71,7 +91,50 @@ async function searchCases(keyword: string): Promise<CaseWithPhone[]> {
     return [];
   }
 
-  return (data as CaseWithPhone[] | null) ?? [];
+  return ((data as CaseRow[] | null) ?? []).map((row) => ({
+    id: row.id,
+    name: row.name,
+    brand: row.brand,
+    price: row.price,
+    phone_id: row.phone_id,
+    phone_name: row.phones?.name ?? null,
+    source: "yodobashi" as const,
+  }));
+}
+
+async function searchMarketplaceOffers(
+  keyword: string,
+): Promise<CaseSearchResult[]> {
+  type OfferRow = MarketplaceOffer & {
+    phones: Pick<Phone, "name"> | null;
+  };
+
+  const { data, error } = await supabase
+    .from("marketplace_offers")
+    .select("*, phones(name)")
+    .or(`name.ilike.%${keyword}%,brand.ilike.%${keyword}%`);
+
+  if (error) {
+    console.error("Failed to search marketplace offers:", error);
+    return [];
+  }
+
+  return ((data as OfferRow[] | null) ?? []).map((row) => ({
+    id: row.id,
+    name: row.name,
+    brand: row.brand,
+    price: row.price,
+    phone_id: row.phone_id,
+    phone_name: row.phones?.name ?? null,
+    source: row.source,
+  }));
+}
+
+function caseHref(item: CaseSearchResult): string {
+  if (item.source === "yodobashi") {
+    return `/phones/${item.phone_id}`;
+  }
+  return `/phones/${item.phone_id}?source=${item.source}`;
 }
 
 export default async function SearchPage({ searchParams }: PageProps) {
@@ -89,11 +152,13 @@ export default async function SearchPage({ searchParams }: PageProps) {
     );
   }
 
-  const [phones, cases] = await Promise.all([
+  const [phones, yodobashiCases, marketplaceCases] = await Promise.all([
     searchPhones(keyword),
-    searchCases(keyword),
+    searchYodobashiCases(keyword),
+    searchMarketplaceOffers(keyword),
   ]);
 
+  const cases = [...yodobashiCases, ...marketplaceCases];
   const hasResults = phones.length > 0 || cases.length > 0;
 
   return (
@@ -158,21 +223,23 @@ export default async function SearchPage({ searchParams }: PageProps) {
                 </h2>
                 <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                   {cases.map((caseItem) => (
-                    <li key={caseItem.id}>
+                    <li key={`${caseItem.source}-${caseItem.id}`}>
                       <Link
-                        href={`/phones/${caseItem.phone_id}`}
+                        href={caseHref(caseItem)}
                         className="block rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition-all hover:border-orange-300 hover:shadow-md"
                       >
                         <h3 className="mb-2 text-lg font-medium tracking-tight text-gray-900">
                           {caseItem.name}
                         </h3>
                         <dl className="space-y-1 text-sm text-gray-600">
-                          <div className="flex gap-2">
-                            <dt className="font-medium text-gray-500">
-                              ブランド
-                            </dt>
-                            <dd>{caseItem.brand}</dd>
-                          </div>
+                          {caseItem.brand ? (
+                            <div className="flex gap-2">
+                              <dt className="font-medium text-gray-500">
+                                ブランド
+                              </dt>
+                              <dd>{caseItem.brand}</dd>
+                            </div>
+                          ) : null}
                           <div className="flex gap-2">
                             <dt className="font-medium text-gray-500">価格</dt>
                             <dd className="font-medium tracking-tight">
@@ -181,7 +248,11 @@ export default async function SearchPage({ searchParams }: PageProps) {
                           </div>
                           <div className="flex gap-2">
                             <dt className="font-medium text-gray-500">端末</dt>
-                            <dd>{caseItem.phones?.name ?? "—"}</dd>
+                            <dd>{caseItem.phone_name ?? "—"}</dd>
+                          </div>
+                          <div className="flex gap-2">
+                            <dt className="font-medium text-gray-500">店舗</dt>
+                            <dd>{SOURCE_LABEL[caseItem.source]}</dd>
                           </div>
                         </dl>
                       </Link>

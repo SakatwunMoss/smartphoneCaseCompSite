@@ -52,6 +52,14 @@ function isIrrelevantItem(itemName: string): boolean {
   return EXCLUDE_KEYWORDS.some((kw) => itemName.includes(kw));
 }
 
+/**
+ * mediumImageUrls は通常 `_ex=128x128`。
+ * サムネサーバはサイズ指定を差し替え可能なので、表示用に 300x300 へ上げる。
+ */
+function upgradeRakutenImageUrl(url: string): string {
+  return url.replace(/_ex=\d+x\d+/i, "_ex=300x300");
+}
+
 function mapItem(item: RakutenItem): MarketplaceOffer | null {
   if (
     !item.itemCode ||
@@ -66,6 +74,8 @@ function mapItem(item: RakutenItem): MarketplaceOffer | null {
     return null;
   }
 
+  const rawImage = item.mediumImageUrls?.[0]?.imageUrl ?? null;
+
   return {
     source: "rakuten",
     item_code: item.itemCode,
@@ -73,7 +83,7 @@ function mapItem(item: RakutenItem): MarketplaceOffer | null {
     brand: item.shopName ?? null,
     price: item.itemPrice,
     url: item.itemUrl,
-    image_url: item.mediumImageUrls?.[0]?.imageUrl ?? null,
+    image_url: rawImage ? upgradeRakutenImageUrl(rawImage) : null,
     review_count: item.reviewCount ?? null,
     review_rate: item.reviewAverage ?? null,
   };

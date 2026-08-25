@@ -250,7 +250,8 @@ export function CaseListWithCompare({ cases }: CaseListWithCompareProps) {
                   <ProductImage
                     src={caseItem.image_url}
                     alt={caseItem.name}
-                    aspectClassName="aspect-square"
+                    aspectClassName="aspect-square mx-auto w-3/4"
+                    objectFit="contain"
                   />
                 ) : null}
                 <h3 className="mb-2 pr-8 text-lg font-medium tracking-tight text-gray-900">

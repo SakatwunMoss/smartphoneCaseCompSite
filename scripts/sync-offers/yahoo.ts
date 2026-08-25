@@ -29,7 +29,14 @@ interface YahooSeller {
 }
 
 interface YahooImage {
+  small?: string;
   medium?: string;
+}
+
+interface YahooExImage {
+  url?: string;
+  width?: number;
+  height?: number;
 }
 
 interface YahooReview {
@@ -45,6 +52,7 @@ interface YahooHit {
   price?: number;
   url?: string;
   image?: YahooImage;
+  exImage?: YahooExImage;
   review?: YahooReview;
 }
 
@@ -80,7 +88,8 @@ function mapHit(hit: YahooHit): MarketplaceOffer | null {
     brand: hit.brand?.name ?? hit.seller?.name ?? null,
     price: hit.price,
     url: hit.url,
-    image_url: hit.image?.medium ?? null,
+    // image.medium は 146x146。image_size=300 指定時の exImage を優先する
+    image_url: hit.exImage?.url ?? hit.image?.medium ?? null,
     review_count: hit.review?.count ?? null,
     review_rate: hit.review?.rate ?? null,
   };
@@ -107,6 +116,8 @@ async function fetchPage(
     query: keyword,
     results: "30",
     start: String(start),
+    // デフォルトの medium(146) より大きいサムネを exImage で取得
+    image_size: "300",
   });
 
   // iPhone機種のみジャンルで絞り込み（Androidはkeywordのみ）
