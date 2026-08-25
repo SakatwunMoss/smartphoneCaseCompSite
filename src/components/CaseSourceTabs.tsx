@@ -1,10 +1,19 @@
 "use client";
 
-import { useCallback, useMemo, useTransition } from "react";
+import { useCallback, useMemo, useState, useTransition } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import { CaseListWithCompare } from "@/components/CaseListWithCompare";
+import {
+  CompareSelectionBar,
+  CompareTable,
+} from "@/components/ProductCompare";
 import { ProductImage } from "@/components/ProductImage";
+import {
+  MAX_COMPARE_SELECTION,
+  offerToComparable,
+  type ComparableItem,
+} from "@/lib/comparable";
 import type { Case, MarketplaceOffer } from "@/types/database";
 
 // "other" = cases テーブル由来（旧 yodobashi）。複数ショップが混在するため表示名は「その他」。
@@ -89,7 +98,19 @@ function EmptyState() {
   );
 }
 
-function MarketplaceOfferList({ offers }: { offers: MarketplaceOffer[] }) {
+type MarketplaceOfferListProps = {
+  offers: MarketplaceOffer[];
+  selectedIds: Set<string>;
+  isMaxSelected: boolean;
+  onToggle: (item: ComparableItem) => void;
+};
+
+function MarketplaceOfferList({
+  offers,
+  selectedIds,
+  isMaxSelected,
+  onToggle,
+}: MarketplaceOfferListProps) {
   if (offers.length === 0) {
     return <EmptyState />;
   }
@@ -97,18 +118,32 @@ function MarketplaceOfferList({ offers }: { offers: MarketplaceOffer[] }) {
   return (
     <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {offers.map((offer) => {
+        const item = offerToComparable(offer);
+        const isSelected = selectedIds.has(item.id);
+        const isDisabled = !isSelected && isMaxSelected;
         const showReviews =
           offer.review_rate != null || offer.review_count != null;
 
         return (
           <li key={offer.id || `${offer.source}-${offer.item_code}`}>
-            <a
-              href={offer.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="relative flex min-h-[14rem] flex-col rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition-all hover:border-orange-300 hover:shadow-md"
+            <label
+              className={`relative flex min-h-[14rem] cursor-pointer flex-col rounded-xl border bg-white p-4 shadow-sm transition-all ${
+                isSelected
+                  ? "border-orange-500 ring-2 ring-orange-500/20"
+                  : isDisabled
+                    ? "cursor-not-allowed border-gray-200 opacity-60"
+                    : "border-gray-200 hover:border-orange-300 hover:shadow-md"
+              }`}
             >
-              <ExternalLinkIcon className="absolute right-4 top-4 h-4 w-4 text-gray-400" />
+              <input
+                type="checkbox"
+                checked={isSelected}
+                disabled={isDisabled}
+                onChange={() => onToggle(item)}
+                className="absolute right-4 top-4 z-10 h-4 w-4 rounded border-gray-300 text-orange-500 focus:ring-orange-500 disabled:cursor-not-allowed disabled:opacity-50"
+                aria-label={`${offer.name}を比較に追加`}
+              />
+              <ExternalLinkIcon className="pointer-events-none absolute right-10 top-4 h-4 w-4 text-gray-400" />
 
               {offer.image_url ? (
                 <ProductImage
@@ -119,7 +154,7 @@ function MarketplaceOfferList({ offers }: { offers: MarketplaceOffer[] }) {
                 />
               ) : null}
 
-              <h3 className="mb-2 pr-8 text-lg font-medium tracking-tight text-gray-900">
+              <h3 className="mb-2 pr-14 text-lg font-medium tracking-tight text-gray-900">
                 {offer.name}
               </h3>
 
@@ -153,11 +188,17 @@ function MarketplaceOfferList({ offers }: { offers: MarketplaceOffer[] }) {
                 ) : null}
               </dl>
 
-              <span className="mt-auto inline-flex items-center gap-1 pt-3 text-sm font-medium text-orange-500">
+              <a
+                href={offer.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
+                className="mt-auto inline-flex items-center gap-1 pt-3 text-sm font-medium text-orange-500 underline-offset-2 transition-colors hover:text-orange-600 hover:underline"
+              >
                 購入先を見る
                 <ExternalLinkIcon className="h-3.5 w-3.5" />
-              </span>
-            </a>
+              </a>
+            </label>
           </li>
         );
       })}
@@ -175,10 +216,52 @@ export function CaseSourceTabs({
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
 
+  // タブ横断で比較選択を保持（ComparableItem 本体を Map に保持）
+  const [selectedMap, setSelectedMap] = useState<Map<string, ComparableItem>>(
+    () => new Map(),
+  );
+  const [showCompare, setShowCompare] = useState(false);
+
   const activeSource = useMemo(
     () => parseSource(searchParams.get("source")),
     [searchParams],
   );
+
+  const selectedIds = useMemo(
+    () => new Set(selectedMap.keys()),
+    [selectedMap],
+  );
+  const selectedItems = useMemo(
+    () => Array.from(selectedMap.values()),
+    [selectedMap],
+  );
+  const selectedCount = selectedMap.size;
+  const isMaxSelected = selectedCount >= MAX_COMPARE_SELECTION;
+  const canCompare = selectedCount >= 2;
+
+  const toggleSelection = useCallback((item: ComparableItem) => {
+    setSelectedMap((prev) => {
+      const next = new Map(prev);
+      if (next.has(item.id)) {
+        next.delete(item.id);
+      } else if (next.size < MAX_COMPARE_SELECTION) {
+        next.set(item.id, item);
+      }
+      return next;
+    });
+    setShowCompare(false);
+  }, []);
+
+  const clearSelection = useCallback(() => {
+    setSelectedMap(new Map());
+    setShowCompare(false);
+  }, []);
+
+  const handleCompare = useCallback(() => {
+    if (selectedCount >= 2) {
+      setShowCompare(true);
+    }
+  }, [selectedCount]);
 
   const counts: Record<CaseSource, number> = {
     other: otherCases.length,
@@ -236,6 +319,10 @@ export function CaseSourceTabs({
         })}
       </div>
 
+      {showCompare && canCompare ? (
+        <CompareTable items={selectedItems} onClear={clearSelection} />
+      ) : null}
+
       <div
         role="tabpanel"
         id={`panel-${activeSource}`}
@@ -243,20 +330,42 @@ export function CaseSourceTabs({
       >
         {activeSource === "other" ? (
           otherCases.length > 0 ? (
-            <CaseListWithCompare cases={otherCases} />
+            <CaseListWithCompare
+              cases={otherCases}
+              selectedIds={selectedIds}
+              isMaxSelected={isMaxSelected}
+              onToggle={toggleSelection}
+            />
           ) : (
             <EmptyState />
           )
         ) : null}
 
         {activeSource === "rakuten" ? (
-          <MarketplaceOfferList offers={rakutenOffers} />
+          <MarketplaceOfferList
+            offers={rakutenOffers}
+            selectedIds={selectedIds}
+            isMaxSelected={isMaxSelected}
+            onToggle={toggleSelection}
+          />
         ) : null}
 
         {activeSource === "yahoo" ? (
-          <MarketplaceOfferList offers={yahooOffers} />
+          <MarketplaceOfferList
+            offers={yahooOffers}
+            selectedIds={selectedIds}
+            isMaxSelected={isMaxSelected}
+            onToggle={toggleSelection}
+          />
         ) : null}
       </div>
+
+      <CompareSelectionBar
+        selectedCount={selectedCount}
+        canCompare={canCompare}
+        onClear={clearSelection}
+        onCompare={handleCompare}
+      />
     </div>
   );
 }
