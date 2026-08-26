@@ -1,0 +1,24 @@
+# Phone Case Compare
+
+## サイトの概要
+
+Phone Case Compare は、スマートフォンの機種ごとに対応するケース商品を比較できる情報サイトです。楽天市場・Yahoo!ショッピングの掲載価格を一覧で確認し、購入の参考にしていただけます。
+
+## 主要ページ
+
+- [ホーム（端末一覧・メーカー絞り込み）](https://smartphone-case-comp-site.vercel.app/)
+- 端末別ケース比較: `/phones/{端末ID}`（ホームの各端末から遷移）
+- [検索](https://smartphone-case-comp-site.vercel.app/search)
+- [コラム記事一覧](https://smartphone-case-comp-site.vercel.app/columns)
+- [運営者情報](https://smartphone-case-comp-site.vercel.app/about)
+- [お問い合わせ](https://smartphone-case-comp-site.vercel.app/contact)
+- [プライバシーポリシー](https://smartphone-case-comp-site.vercel.app/privacy-policy)
+- [特定商取引法に基づく表記](https://smartphone-case-comp-site.vercel.app/tokushoho)
+
+## 更新頻度・データソース
+
+端末ごとのケース商品・価格情報は、楽天市場 API および Yahoo!ショッピング API から定期的に取得・更新しています（原則として毎日）。コラム記事などの編集コンテンツは必要に応じて更新します。
+
+## 免責事項
+
+掲載している価格・在庫・商品情報は変動する可能性があります。購入を検討される際は、必ず各販売元（リンク先）の最新情報をご確認ください。当サイトは商品の直接販売は行っておらず、掲載内容の正確性・完全性を保証するものではありません。
