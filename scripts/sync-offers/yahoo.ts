@@ -51,6 +51,7 @@ interface YahooHit {
   seller?: YahooSeller;
   price?: number;
   url?: string;
+  affiliateUrl?: string;
   image?: YahooImage;
   exImage?: YahooExImage;
   review?: YahooReview;
@@ -73,7 +74,8 @@ function isIPhoneKeyword(keyword: string): boolean {
 }
 
 function mapHit(hit: YahooHit): MarketplaceOffer | null {
-  if (!hit.code || !hit.name || hit.price == null || !hit.url) {
+  const url = hit.affiliateUrl || hit.url;
+  if (!hit.code || !hit.name || hit.price == null || !url) {
     return null;
   }
 
@@ -87,7 +89,7 @@ function mapHit(hit: YahooHit): MarketplaceOffer | null {
     name: hit.name,
     brand: hit.brand?.name ?? hit.seller?.name ?? null,
     price: hit.price,
-    url: hit.url,
+    url,
     // image.medium は 146x146。image_size=300 指定時の exImage を優先する
     image_url: hit.exImage?.url ?? hit.image?.medium ?? null,
     review_count: hit.review?.count ?? null,
@@ -95,21 +97,42 @@ function mapHit(hit: YahooHit): MarketplaceOffer | null {
   };
 }
 
-function getClientId(): string {
+function getCredentials() {
   const clientId = process.env.YAHOO_CLIENT_ID;
   if (!clientId) {
     throw new Error(
       "YAHOO_CLIENT_ID が設定されていません。.env.local を確認してください。",
     );
   }
-  return clientId;
+
+  const vcSid = process.env.VC_SID;
+  if (!vcSid) {
+    throw new Error(
+      "VC_SID が設定されていません。.env.local を確認してください。",
+    );
+  }
+
+  const vcPid = process.env.VC_PID;
+  if (!vcPid) {
+    throw new Error(
+      "VC_PID が設定されていません。.env.local を確認してください。",
+    );
+  }
+
+  const affiliateReferralUrl = `http://ck.jp.ap.valuecommerce.com/servlet/referral?sid=${vcSid}&pid=${vcPid}&vc_url=`;
+
+  return {
+    clientId,
+    affiliateType: "vc",
+    affiliateId: encodeURIComponent(affiliateReferralUrl),
+  };
 }
 
 async function fetchPage(
   keyword: string,
   start: number,
 ): Promise<MarketplaceOffer[]> {
-  const clientId = getClientId();
+  const { clientId, affiliateType, affiliateId } = getCredentials();
 
   const params = new URLSearchParams({
     appid: clientId,
@@ -118,6 +141,8 @@ async function fetchPage(
     start: String(start),
     // デフォルトの medium(146) より大きいサムネを exImage で取得
     image_size: "300",
+    affiliate_type: affiliateType,
+    affiliate_id: affiliateId,
   });
 
   // iPhone機種のみジャンルで絞り込み（Androidはkeywordのみ）

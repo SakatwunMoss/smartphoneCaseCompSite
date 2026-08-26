@@ -30,10 +30,23 @@ async function main() {
     process.exit(1);
   }
 
+  const vcSid = process.env.VC_SID;
+  const vcPid = process.env.VC_PID;
+  if (!vcSid || !vcPid) {
+    console.error(
+      "エラー: VC_SID / VC_PID が設定されていません。.env.local に追記してください。",
+    );
+    process.exit(1);
+  }
+
+  const affiliateReferralUrl = `http://ck.jp.ap.valuecommerce.com/servlet/referral?sid=${vcSid}&pid=${vcPid}&vc_url=`;
+
   const params = new URLSearchParams({
     appid: clientId,
     query: QUERY,
     results: "30",
+    affiliate_type: "vc",
+    affiliate_id: encodeURIComponent(affiliateReferralUrl),
   });
 
   const url = `${ENDPOINT}?${params.toString()}`;
@@ -116,7 +129,13 @@ async function main() {
     console.log(`\n[${i + 1}]`);
     console.log(`  商品名: ${item.name ?? "(なし)"}`);
     console.log(`  価格: ${item.price ?? "(なし)"}`);
-    console.log(`  URL: ${item.url ?? "(なし)"}`);
+    const itemUrl = item.affiliateUrl ?? item.url;
+    console.log(`  URL: ${itemUrl ?? "(なし)"}`);
+    console.log(
+      `  アフィリエイト: ${
+        itemUrl?.includes("ck.jp.ap.valuecommerce.com") ? "✓ バリューコマース" : "✗ 未リンク化"
+      }`,
+    );
     console.log(`  ストア名: ${storeName}`);
     console.log(`  ストアID: ${storeId}`);
     console.log(`  janCode: ${formatPresence(item, "janCode")}`);

@@ -75,6 +75,8 @@ async function main() {
   requireEnv("RAKUTEN_ACCESS_KEY");
   requireEnv("RAKUTEN_AFFILIATE_ID");
   requireEnv("YAHOO_CLIENT_ID");
+  requireEnv("VC_SID");
+  requireEnv("VC_PID");
 
   const supabase = createClient(supabaseUrl, serviceRoleKey);
   const phoneFilter = parsePhoneFilter(process.argv.slice(2));
