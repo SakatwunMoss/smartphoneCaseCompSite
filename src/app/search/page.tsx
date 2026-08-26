@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import type { Metadata } from "next";
 
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { CaseSearchResults } from "@/components/CaseSearchResults";
 import type { CaseSearchItem } from "@/lib/case-search-filters";
 import { buildPageMetadata } from "@/lib/metadata";
@@ -19,6 +20,7 @@ export async function generateMetadata({
 }: PageProps): Promise<Metadata> {
   const keyword = getQuery((await searchParams).q);
 
+  // title/description はキーワードで変えるが、canonical は常にクエリなし
   if (!keyword) {
     return buildPageMetadata({
       title: "検索 | Phone Case Compare",
@@ -30,7 +32,7 @@ export async function generateMetadata({
   return buildPageMetadata({
     title: `「${keyword}」の検索結果 | Phone Case Compare`,
     description: `「${keyword}」に一致する端末・ケースの検索結果`,
-    path: `/search?q=${encodeURIComponent(keyword)}`,
+    path: "/search",
   });
 }
 
@@ -124,6 +126,15 @@ export default async function SearchPage({ searchParams }: PageProps) {
     return (
       <div className="flex flex-1 flex-col px-6 py-10">
         <main className="mx-auto w-full max-w-6xl">
+          <Breadcrumbs
+            items={[
+              { label: "ホーム", href: "/" },
+              { label: "検索", href: "/search" },
+            ]}
+          />
+          <h1 className="mb-8 text-2xl font-semibold tracking-tight text-gray-900 sm:text-3xl">
+            検索
+          </h1>
           <p className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-8 text-center text-gray-600">
             検索キーワードを入力してください
           </p>
@@ -144,6 +155,12 @@ export default async function SearchPage({ searchParams }: PageProps) {
   return (
     <div className="flex flex-1 flex-col px-6 py-10">
       <main className="mx-auto w-full max-w-6xl">
+        <Breadcrumbs
+          items={[
+            { label: "ホーム", href: "/" },
+            { label: "検索", href: "/search" },
+          ]}
+        />
         <h1 className="mb-8 text-2xl font-semibold tracking-tight text-gray-900 sm:text-3xl">
           「{keyword}」の検索結果
         </h1>

@@ -149,7 +149,11 @@ function MarketplaceOfferList({
               {offer.image_url ? (
                 <ProductImage
                   src={offer.image_url}
-                  alt={offer.name}
+                  alt={
+                    offer.brand
+                      ? `${offer.brand} ${offer.name} 商品画像`
+                      : `${offer.name} 商品画像`
+                  }
                   aspectClassName="aspect-square mx-auto w-3/4"
                   objectFit="contain"
                 />

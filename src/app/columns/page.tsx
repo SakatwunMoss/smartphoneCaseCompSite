@@ -1,6 +1,7 @@
-import Link from "next/link";
 import type { Metadata } from "next";
+import Link from "next/link";
 
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { columns } from "@/lib/columns";
 import { buildPageMetadata } from "@/lib/metadata";
 
@@ -14,12 +15,12 @@ export default function ColumnsPage() {
   return (
     <div className="flex flex-1 flex-col px-6 py-10">
       <main className="mx-auto w-full max-w-6xl">
-        <Link
-          href="/"
-          className="mb-6 inline-block text-sm text-gray-600 transition-colors hover:text-orange-600"
-        >
-          ← 一覧に戻る
-        </Link>
+        <Breadcrumbs
+          items={[
+            { label: "ホーム", href: "/" },
+            { label: "コラム", href: "/columns" },
+          ]}
+        />
 
         <h1 className="mb-2 text-3xl font-semibold tracking-tight text-gray-900">
           コラム

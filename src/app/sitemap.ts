@@ -4,25 +4,9 @@ import { columns } from "@/lib/columns";
 import { supabase } from "@/lib/supabase";
 import type { Phone } from "@/types/database";
 
-function getBaseUrl(): string {
-  if (process.env.NEXT_PUBLIC_SITE_URL) {
-    return process.env.NEXT_PUBLIC_SITE_URL.replace(/\/$/, "");
-  }
-
-  if (process.env.VERCEL_PROJECT_PRODUCTION_URL) {
-    return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`;
-  }
-
-  if (process.env.VERCEL_URL) {
-    return `https://${process.env.VERCEL_URL}`;
-  }
-
-  return "http://localhost:3000";
-}
+const BASE_URL = "https://smartphone-case-comp-site.vercel.app";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = getBaseUrl();
-
   const { data, error } = await supabase.from("phones").select("*");
 
   if (error) {
@@ -30,56 +14,57 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }
 
   const phones: Phone[] = data ?? [];
+  const now = new Date();
 
   const staticPages: MetadataRoute.Sitemap = [
     {
-      url: baseUrl,
-      lastModified: new Date(),
+      url: BASE_URL,
+      lastModified: now,
       changeFrequency: "daily",
       priority: 1,
     },
     {
-      url: `${baseUrl}/columns`,
-      lastModified: new Date(),
+      url: `${BASE_URL}/columns`,
+      lastModified: now,
       changeFrequency: "weekly",
       priority: 0.8,
     },
     {
-      url: `${baseUrl}/about`,
-      lastModified: new Date(),
+      url: `${BASE_URL}/about`,
+      lastModified: now,
       changeFrequency: "monthly",
       priority: 0.5,
     },
     {
-      url: `${baseUrl}/contact`,
-      lastModified: new Date(),
+      url: `${BASE_URL}/contact`,
+      lastModified: now,
       changeFrequency: "monthly",
       priority: 0.5,
     },
     {
-      url: `${baseUrl}/privacy-policy`,
-      lastModified: new Date(),
+      url: `${BASE_URL}/privacy-policy`,
+      lastModified: now,
       changeFrequency: "yearly",
       priority: 0.3,
     },
     {
-      url: `${baseUrl}/tokushoho`,
-      lastModified: new Date(),
+      url: `${BASE_URL}/tokushoho`,
+      lastModified: now,
       changeFrequency: "yearly",
       priority: 0.3,
     },
   ];
 
   const phonePages: MetadataRoute.Sitemap = phones.map((phone) => ({
-    url: `${baseUrl}/phones/${phone.id}`,
-    lastModified: new Date(),
+    url: `${BASE_URL}/phones/${phone.id}`,
+    lastModified: now,
     changeFrequency: "weekly",
     priority: 0.7,
   }));
 
   const columnPages: MetadataRoute.Sitemap = columns.map((column) => ({
-    url: `${baseUrl}/columns/${column.slug}`,
-    lastModified: new Date(),
+    url: `${BASE_URL}/columns/${column.slug}`,
+    lastModified: now,
     changeFrequency: "monthly",
     priority: 0.6,
   }));

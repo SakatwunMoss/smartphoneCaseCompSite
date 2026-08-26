@@ -1,6 +1,7 @@
-import Link from "next/link";
 import type { Metadata } from "next";
+import Link from "next/link";
 
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { buildPageMetadata } from "@/lib/metadata";
 
 export const metadata: Metadata = buildPageMetadata({
@@ -13,12 +14,12 @@ export default function AboutPage() {
   return (
     <div className="flex flex-1 flex-col px-6 py-10">
       <main className="mx-auto w-full max-w-3xl">
-        <Link
-          href="/"
-          className="mb-6 inline-block text-sm text-gray-600 transition-colors hover:text-orange-600"
-        >
-          ← 一覧に戻る
-        </Link>
+        <Breadcrumbs
+          items={[
+            { label: "ホーム", href: "/" },
+            { label: "運営者情報", href: "/about" },
+          ]}
+        />
 
         <h1 className="mb-8 text-3xl font-semibold tracking-tight text-gray-900">
           運営者情報

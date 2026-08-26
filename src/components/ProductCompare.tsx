@@ -123,7 +123,14 @@ export function CompareTable({ items, onClear }: CompareTableProps) {
                   className="border-b border-gray-100 px-3 py-4 align-top"
                 >
                   {item.image_url ? (
-                    <CompareTableImage src={item.image_url} alt={item.name} />
+                    <CompareTableImage
+                      src={item.image_url}
+                      alt={
+                        item.brand
+                          ? `${item.brand} ${item.name} 商品画像`
+                          : `${item.name} 商品画像`
+                      }
+                    />
                   ) : (
                     <span className="text-gray-400">—</span>
                   )}

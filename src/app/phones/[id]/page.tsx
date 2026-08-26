@@ -1,10 +1,12 @@
-import Link from "next/link";
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
 
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { CaseSourceTabs } from "@/components/CaseSourceTabs";
+import { JsonLd } from "@/components/JsonLd";
 import { PhoneDescription } from "@/components/PhoneDescription";
+import { buildPhoneCasesItemListJsonLd } from "@/lib/json-ld";
 import { buildPageMetadata } from "@/lib/metadata";
 import { supabase } from "@/lib/supabase";
 import type { Case, MarketplaceOffer, Phone } from "@/types/database";
@@ -117,15 +119,22 @@ export default async function PhoneDetailPage({ params }: PageProps) {
     getMarketplaceOffers(id, "yahoo"),
   ]);
 
+  const casesItemListJsonLd = buildPhoneCasesItemListJsonLd(
+    phone,
+    otherCases,
+    [...rakutenOffers, ...yahooOffers],
+  );
+
   return (
     <div className="flex flex-1 flex-col px-6 py-10">
       <main className="mx-auto w-full max-w-6xl">
-        <Link
-          href="/"
-          className="mb-6 inline-block text-sm text-gray-600 transition-colors hover:text-orange-600"
-        >
-          ← 一覧に戻る
-        </Link>
+        <JsonLd data={casesItemListJsonLd} />
+        <Breadcrumbs
+          items={[
+            { label: "ホーム", href: "/" },
+            { label: phone.name, href: `/phones/${phone.id}` },
+          ]}
+        />
 
         <header className="mb-8 rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
           <h1 className="mb-3 text-3xl font-semibold tracking-tight text-gray-900 sm:text-4xl">

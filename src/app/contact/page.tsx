@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { buildPageMetadata } from "@/lib/metadata";
 import { ContactForm } from "./ContactForm";
 
@@ -14,12 +14,12 @@ export default function ContactPage() {
   return (
     <div className="flex flex-1 flex-col px-6 py-10">
       <main className="mx-auto w-full max-w-3xl">
-        <Link
-          href="/"
-          className="mb-6 inline-block text-sm text-gray-600 transition-colors hover:text-orange-600"
-        >
-          ← 一覧に戻る
-        </Link>
+        <Breadcrumbs
+          items={[
+            { label: "ホーム", href: "/" },
+            { label: "お問い合わせ", href: "/contact" },
+          ]}
+        />
 
         <h1 className="mb-3 text-3xl font-semibold tracking-tight text-gray-900">
           お問い合わせ

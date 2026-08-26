@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
-const SITE_NAME = "Phone Case Compare";
+export const SITE_NAME = "Phone Case Compare";
+export const SITE_URL = "https://smartphone-case-comp-site.vercel.app";
 
 export function buildPageMetadata({
   title,
@@ -11,13 +12,12 @@ export function buildPageMetadata({
   description: string;
   path?: string;
 }): Metadata {
-  const url = path
-    ? `https://smartphone-case-comp-site.vercel.app${path}`
-    : undefined;
+  const url = path ? `${SITE_URL}${path}` : undefined;
 
   return {
     title,
     description,
+    ...(url ? { alternates: { canonical: url } } : {}),
     openGraph: {
       title,
       description,

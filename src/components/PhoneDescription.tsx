@@ -13,9 +13,9 @@ function StructuredDescription({ intro, sections }: ParsedPhoneDescription) {
       {intro ? <p>{intro}</p> : null}
       {sections.map((section) => (
         <section key={section.heading}>
-          <h3 className="mb-2 text-base font-medium text-gray-900">
+          <h2 className="mb-2 text-base font-medium text-gray-900">
             {section.heading}
-          </h3>
+          </h2>
           <p>{section.body}</p>
         </section>
       ))}

@@ -52,7 +52,11 @@ export function CaseListWithCompare({
               {caseItem.image_url ? (
                 <ProductImage
                   src={caseItem.image_url}
-                  alt={caseItem.name}
+                  alt={
+                    caseItem.brand
+                      ? `${caseItem.brand} ${caseItem.name} 商品画像`
+                      : `${caseItem.name} 商品画像`
+                  }
                   aspectClassName="aspect-square mx-auto w-3/4"
                   objectFit="contain"
                 />

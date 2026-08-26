@@ -5,24 +5,30 @@ import Link from "next/link";
 import { Suspense } from "react";
 import type { Metadata } from "next";
 
+import { Breadcrumbs } from "@/components/Breadcrumbs";
+import { JsonLd } from "@/components/JsonLd";
 import { PhoneFilterPanel } from "@/components/PhoneFilterPanel";
 import { ProductImage } from "@/components/ProductImage";
 import { columns } from "@/lib/columns";
+import { buildPhonesItemListJsonLd } from "@/lib/json-ld";
 import { buildPageMetadata } from "@/lib/metadata";
 import { parsePhoneFilters } from "@/lib/phone-filters";
 import { getPhoneFilterOptions, getPhones } from "@/lib/phones";
 
 const featuredColumns = columns.slice(0, 3);
 
-export const metadata: Metadata = buildPageMetadata({
-  title: "Phone Case Compare",
-  description: "スマホケースを比較するサイト",
-  path: "/",
-});
-
 type HomeProps = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
+
+/** 絞り込み・並び替えのクエリがあっても canonical は常にベース URL */
+export async function generateMetadata(): Promise<Metadata> {
+  return buildPageMetadata({
+    title: "Phone Case Compare",
+    description: "スマホケースを比較するサイト",
+    path: "/",
+  });
+}
 
 export default async function Home({ searchParams }: HomeProps) {
   const params = await searchParams;
@@ -32,12 +38,16 @@ export default async function Home({ searchParams }: HomeProps) {
     getPhoneFilterOptions(),
   ]);
 
+  const itemListJsonLd =
+    phones && phones.length > 0 ? buildPhonesItemListJsonLd(phones) : null;
+
   return (
     <div className="flex flex-1 flex-col">
+      {itemListJsonLd ? <JsonLd data={itemListJsonLd} /> : null}
       <section aria-labelledby="hero-heading" className="w-full bg-orange-50">
         <Image
           src="/images/hero-main.png"
-          alt="PHONE CASE COMPARE"
+          alt="Phone Case Compare ヒーローイメージ"
           width={1584}
           height={672}
           priority
@@ -56,6 +66,7 @@ export default async function Home({ searchParams }: HomeProps) {
 
       <div className="px-6 py-10">
         <main className="mx-auto w-full max-w-6xl">
+          <Breadcrumbs items={[{ label: "ホーム", href: "/" }]} />
           <Suspense
             fallback={
               <div className="mb-6 h-40 animate-pulse rounded-xl border border-gray-200 bg-gray-50" />
@@ -81,7 +92,10 @@ export default async function Home({ searchParams }: HomeProps) {
                     className="flex min-h-[11rem] flex-col rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition-all hover:border-orange-300 hover:shadow-md"
                   >
                     {phone.image_url ? (
-                      <ProductImage src={phone.image_url} alt={phone.name} />
+                      <ProductImage
+                        src={phone.image_url}
+                        alt={`${phone.name} イメージ画像`}
+                      />
                     ) : null}
                     <h2 className="mb-2 text-lg font-medium tracking-tight text-gray-900">
                       {phone.name}
