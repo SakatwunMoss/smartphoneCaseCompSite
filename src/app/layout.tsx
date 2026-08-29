@@ -2,9 +2,10 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Script from "next/script";
 import { Analytics } from "@vercel/analytics/next";
+import { Suspense } from "react";
 
 import { Footer } from "@/components/Footer";
-import { GoogleAnalytics } from "@/components/GoogleAnalytics";
+import { GoogleAnalyticsPageView } from "@/components/GoogleAnalytics";
 import { Header } from "@/components/Header";
 import "./globals.css";
 
@@ -17,6 +18,9 @@ const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });
+
+const GA_ID = process.env.NEXT_PUBLIC_GA_ID;
+const ADSENSE_CLIENT = "ca-pub-7938835154204291";
 
 export const metadata: Metadata = {
   // 相対パスの OG / Twitter 画像などを絶対 URL に解決する
@@ -49,7 +53,7 @@ export const metadata: Metadata = {
     google: "LXnGM94kDLw16JNHb1gAN7f7R8PM7OV8iyX9kZhh2pw",
   },
   other: {
-    "google-adsense-account": "ca-pub-7938835154204291",
+    "google-adsense-account": ADSENSE_CLIENT,
   },
 };
 
@@ -65,13 +69,31 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-white text-gray-900">
-        <GoogleAnalytics />
+        {GA_ID ? (
+          <>
+            <Script
+              src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
+              strategy="beforeInteractive"
+            />
+            <Script id="google-analytics" strategy="beforeInteractive">
+              {`
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', '${GA_ID}', { send_page_view: false });
+              `}
+            </Script>
+          </>
+        ) : null}
         <Script
           async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7938835154204291"
+          src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}`}
           crossOrigin="anonymous"
-          strategy="afterInteractive"
+          strategy="beforeInteractive"
         />
+        <Suspense fallback={null}>
+          <GoogleAnalyticsPageView />
+        </Suspense>
         <Header />
         {children}
         <Footer />
