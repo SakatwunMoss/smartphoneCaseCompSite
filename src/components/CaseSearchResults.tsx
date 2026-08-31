@@ -6,6 +6,7 @@ import { useSearchParams } from "next/navigation";
 
 import { AffiliateBadge } from "@/components/AffiliateBadge";
 import { CaseSearchFilterPanel } from "@/components/CaseSearchFilterPanel";
+import { ProductImage } from "@/components/ProductImage";
 import {
   CASE_SEARCH_SOURCE_LABEL,
   filterAndSortCaseSearchResults,
@@ -30,37 +31,51 @@ function caseCardClassName(): string {
 }
 
 function CaseCardContent({ item }: { item: CaseSearchItem }) {
+  const imageAlt = item.brand
+    ? `${item.brand} ${item.name} 商品画像`
+    : `${item.name} 商品画像`;
+
   return (
-    <>
-      <div className="mb-2 flex items-start justify-between gap-2">
-        <h3 className="text-lg font-medium tracking-tight text-gray-900">
-          {item.name}
-        </h3>
-        {item.url ? <AffiliateBadge /> : null}
-      </div>
-      <dl className="space-y-1 text-sm text-gray-600">
-        {item.brand ? (
+    <div className="flex gap-3">
+      {item.image_url ? (
+        <ProductImage
+          src={item.image_url}
+          alt={imageAlt}
+          aspectClassName="mb-0 aspect-square w-20 shrink-0"
+          objectFit="contain"
+        />
+      ) : null}
+      <div className="min-w-0 flex-1">
+        <div className="mb-2 flex items-start justify-between gap-2">
+          <h3 className="text-lg font-medium tracking-tight text-gray-900">
+            {item.name}
+          </h3>
+          {item.url ? <AffiliateBadge /> : null}
+        </div>
+        <dl className="space-y-1 text-sm text-gray-600">
+          {item.brand ? (
+            <div className="flex gap-2">
+              <dt className="font-medium text-gray-500">ブランド</dt>
+              <dd>{item.brand}</dd>
+            </div>
+          ) : null}
           <div className="flex gap-2">
-            <dt className="font-medium text-gray-500">ブランド</dt>
-            <dd>{item.brand}</dd>
+            <dt className="font-medium text-gray-500">価格</dt>
+            <dd className="font-medium tracking-tight">
+              {formatPrice(item.price)}
+            </dd>
           </div>
-        ) : null}
-        <div className="flex gap-2">
-          <dt className="font-medium text-gray-500">価格</dt>
-          <dd className="font-medium tracking-tight">
-            {formatPrice(item.price)}
-          </dd>
-        </div>
-        <div className="flex gap-2">
-          <dt className="font-medium text-gray-500">端末</dt>
-          <dd>{item.phone_name ?? "—"}</dd>
-        </div>
-        <div className="flex gap-2">
-          <dt className="font-medium text-gray-500">店舗</dt>
-          <dd>{CASE_SEARCH_SOURCE_LABEL[item.source]}</dd>
-        </div>
-      </dl>
-    </>
+          <div className="flex gap-2">
+            <dt className="font-medium text-gray-500">端末</dt>
+            <dd>{item.phone_name ?? "—"}</dd>
+          </div>
+          <div className="flex gap-2">
+            <dt className="font-medium text-gray-500">店舗</dt>
+            <dd>{CASE_SEARCH_SOURCE_LABEL[item.source]}</dd>
+          </div>
+        </dl>
+      </div>
+    </div>
   );
 }
 

@@ -81,6 +81,7 @@ async function searchOtherCases(keyword: string): Promise<CaseSearchItem[]> {
     phone_name: row.phones?.name ?? null,
     source: "other" as const,
     url: row.url?.trim() || null,
+    image_url: row.image_url?.trim() || null,
     review_rate: null,
   }));
 }
@@ -111,6 +112,7 @@ async function searchMarketplaceOffers(
     phone_name: row.phones?.name ?? null,
     source: row.source,
     url: row.url?.trim() || null,
+    image_url: row.image_url?.trim() || null,
     review_rate: row.review_rate,
   }));
 }

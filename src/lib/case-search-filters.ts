@@ -24,6 +24,7 @@ export type CaseSearchItem = {
   phone_name: string | null;
   source: CaseSearchSource;
   url: string | null;
+  image_url: string | null;
   review_rate: number | null;
 };
 
