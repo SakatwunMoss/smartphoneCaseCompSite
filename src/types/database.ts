@@ -4,6 +4,8 @@ export type Phone = {
   maker: string;
   released_year: number;
   image_url?: string | null;
+  /** 機種ページ用解説文。### 見出しでセクション分割可能 */
+  description?: string | null;
 };
 
 export type Case = {

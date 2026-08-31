@@ -43,8 +43,49 @@ export default function AboutPage() {
           </section>
 
           <section>
+            <h2 className="mb-3 text-lg font-medium text-gray-900">
+              運営方針
+            </h2>
+            <p>
+              当サイトは、楽天・Yahoo!ショッピング等の公開APIおよび各メーカー公式情報をもとに、対応ケースの価格・スペックを定期的に更新しています。特定のメーカーや商品を優先的に掲載することはなく、利用者が複数の選択肢を比較できることを重視しています。
+            </p>
+          </section>
+
+          <section>
+            <h2 className="mb-3 text-lg font-medium text-gray-900">
+              情報の更新頻度
+            </h2>
+            <ul className="list-inside list-disc space-y-1">
+              <li>ケース価格・在庫情報：週1回（自動同期）</li>
+              <li>機種解説文・コラム記事：月1〜2回</li>
+              <li>新機種追加：主要機種の発売時期に合わせて随時</li>
+            </ul>
+          </section>
+
+          <section>
             <h2 className="mb-3 text-lg font-medium text-gray-900">運営者</h2>
             <p>当サイトは個人により運営されています（当サイト運営者）。</p>
+            <p className="mt-3">
+              当サイト運営者は、スマートフォンアクセサリー比較サイトの企画・運用経験を持ち、実際に複数機種・複数ブランドのケースを使用してきた経験に基づき、選び方のポイントを解説しています。
+            </p>
+          </section>
+
+          <section>
+            <h2 className="mb-3 text-lg font-medium text-gray-900">
+              情報源とアフィリエイトについて
+            </h2>
+            <p>
+              商品情報は各ECサイトのAPIおよびメーカー公式サイトを参照しています。当サイトはAmazonアソシエイト・楽天アフィリエイト等のプログラムに参加しており、リンク経由の購入により報酬を得る場合があります。掲載順位や評価は報酬の有無に左右されません。
+            </p>
+          </section>
+
+          <section>
+            <h2 className="mb-3 text-lg font-medium text-gray-900">
+              免責・正確性について
+            </h2>
+            <p>
+              価格・在庫・スペックは更新タイミングにより実際と異なる場合があります。購入前に各販売元の最新情報をご確認ください。商品に関するお問い合わせは各販売元へ直接お願いします。
+            </p>
           </section>
 
           <section>
@@ -60,6 +101,22 @@ export default function AboutPage() {
               {" "}
               よりお願いいたします。
             </p>
+          </section>
+
+          <section>
+            <h2 className="mb-3 text-lg font-medium text-gray-900">
+              サイト公開・最終更新
+            </h2>
+            <dl className="space-y-1">
+              <div className="flex gap-2">
+                <dt className="font-medium text-gray-500">サイト公開</dt>
+                <dd>2026年8月</dd>
+              </div>
+              <div className="flex gap-2">
+                <dt className="font-medium text-gray-500">本ページ最終更新</dt>
+                <dd>2026年9月</dd>
+              </div>
+            </dl>
           </section>
         </div>
       </main>
