@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
 import { AffiliateBadge } from "@/components/AffiliateBadge";
@@ -58,6 +59,7 @@ export function CompareTable({ items, onClear }: CompareTableProps) {
   const showReviews = items.some(
     (item) => item.review_rate != null || item.review_count != null,
   );
+  const showPhone = items.some((item) => item.phone_name != null);
 
   useEffect(() => {
     compareTableRef.current?.scrollIntoView({
@@ -172,19 +174,37 @@ export function CompareTable({ items, onClear }: CompareTableProps) {
             <tr>
               <th
                 scope="row"
-                className={`py-4 pr-4 align-top font-medium text-gray-500 ${showReviews ? "border-b border-gray-100" : ""}`}
+                className={`py-4 pr-4 align-top font-medium text-gray-500 ${showReviews || showPhone ? "border-b border-gray-100" : ""}`}
               >
                 価格
               </th>
               {items.map((item) => (
                 <td
                   key={item.id}
-                  className={`px-3 py-4 align-top font-medium tracking-tight text-gray-900 ${showReviews ? "border-b border-gray-100" : ""}`}
+                  className={`px-3 py-4 align-top font-medium tracking-tight text-gray-900 ${showReviews || showPhone ? "border-b border-gray-100" : ""}`}
                 >
                   {formatPrice(item.price)}
                 </td>
               ))}
             </tr>
+            {showPhone ? (
+              <tr>
+                <th
+                  scope="row"
+                  className={`py-4 pr-4 align-top font-medium text-gray-500 ${showReviews ? "border-b border-gray-100" : ""}`}
+                >
+                  対応端末
+                </th>
+                {items.map((item) => (
+                  <td
+                    key={item.id}
+                    className={`px-3 py-4 align-top text-gray-700 ${showReviews ? "border-b border-gray-100" : ""}`}
+                  >
+                    {item.phone_name ?? "—"}
+                  </td>
+                ))}
+              </tr>
+            ) : null}
             {showReviews ? (
               <tr>
                 <th
@@ -206,23 +226,52 @@ export function CompareTable({ items, onClear }: CompareTableProps) {
             <tr>
               <th
                 scope="row"
+                className="border-b border-gray-100 py-4 pr-4 align-top font-medium text-gray-500"
+              >
+                店舗
+              </th>
+              {items.map((item) => (
+                <td
+                  key={item.id}
+                  className="border-b border-gray-100 px-3 py-4 align-top text-gray-700"
+                >
+                  {item.sourceLabel}
+                </td>
+              ))}
+            </tr>
+            <tr>
+              <th
+                scope="row"
                 className="py-4 pr-4 align-top font-medium text-gray-500"
               >
                 購入先
               </th>
               {items.map((item) => (
                 <td key={item.id} className="px-3 py-4 align-top">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <AffiliateBadge />
-                    <a
-                      href={item.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
+                  {item.url ? (
+                    <div className="flex flex-wrap items-center gap-2">
+                      <AffiliateBadge />
+                      <a
+                        href={item.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-block font-medium text-orange-500 underline-offset-2 transition-colors hover:text-orange-600 hover:underline"
+                      >
+                        購入先を見る →
+                      </a>
+                    </div>
+                  ) : item.phone_id ? (
+                    <Link
+                      href={`/phones/${item.phone_id}${
+                        item.source === "rakuten" ? "" : `?source=${item.source}`
+                      }`}
                       className="inline-block font-medium text-orange-500 underline-offset-2 transition-colors hover:text-orange-600 hover:underline"
                     >
-                      購入先を見る →
-                    </a>
-                  </div>
+                      端末ページを見る →
+                    </Link>
+                  ) : (
+                    <span className="text-gray-400">—</span>
+                  )}
                 </td>
               ))}
             </tr>
@@ -284,5 +333,77 @@ export function CompareSelectionBar({
       </div>
       <div className="h-16" aria-hidden="true" />
     </>
+  );
+}
+
+type CompareModalProps = {
+  items: ComparableItem[];
+  onClear: () => void;
+  onClose: () => void;
+};
+
+export function CompareModal({ items, onClear, onClose }: CompareModalProps) {
+  const dialogRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        onClose();
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    dialogRef.current?.focus();
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [onClose]);
+
+  const handleClear = () => {
+    onClear();
+    onClose();
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-end justify-center p-0 sm:items-center sm:p-4">
+      <button
+        type="button"
+        className="absolute inset-0 bg-black/50"
+        aria-label="比較を閉じる"
+        onClick={onClose}
+      />
+      <div
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="compare-modal-heading"
+        tabIndex={-1}
+        className="relative z-10 max-h-[90vh] w-full max-w-6xl overflow-y-auto rounded-t-xl bg-gray-50 shadow-xl sm:rounded-xl"
+      >
+        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-gray-200 bg-white px-4 py-3 sm:px-6">
+          <h2
+            id="compare-modal-heading"
+            className="text-lg font-medium text-gray-900"
+          >
+            ケース比較
+          </h2>
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-lg border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-600 transition-colors hover:border-gray-400 hover:text-gray-900"
+          >
+            閉じる
+          </button>
+        </div>
+        <div className="p-4 sm:p-6">
+          <CompareTable items={items} onClear={handleClear} />
+        </div>
+      </div>
+    </div>
   );
 }

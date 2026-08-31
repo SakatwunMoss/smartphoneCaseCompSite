@@ -1,3 +1,7 @@
+import {
+  CASE_SEARCH_SOURCE_LABEL,
+  type CaseSearchItem,
+} from "@/lib/case-search-filters";
 import type { Case, MarketplaceOffer } from "@/types/database";
 
 export type ComparableSource = "other" | "rakuten" | "yahoo";
@@ -14,6 +18,8 @@ export type ComparableItem = {
   image_url: string | null;
   review_rate: number | null;
   review_count: number | null;
+  phone_name?: string | null;
+  phone_id?: string;
 };
 
 export const MAX_COMPARE_SELECTION = 3;
@@ -52,5 +58,22 @@ export function offerToComparable(offer: MarketplaceOffer): ComparableItem {
     image_url: offer.image_url,
     review_rate: offer.review_rate,
     review_count: offer.review_count,
+  };
+}
+
+export function caseSearchItemToComparable(item: CaseSearchItem): ComparableItem {
+  return {
+    id: `${item.source}:${item.id}`,
+    source: item.source,
+    sourceLabel: CASE_SEARCH_SOURCE_LABEL[item.source],
+    name: item.name,
+    brand: item.brand,
+    price: item.price,
+    url: item.url ?? "",
+    image_url: item.image_url,
+    review_rate: item.review_rate,
+    review_count: null,
+    phone_name: item.phone_name,
+    phone_id: item.phone_id,
   };
 }
