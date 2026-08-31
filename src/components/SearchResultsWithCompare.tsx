@@ -31,12 +31,12 @@ function CaseCardContent({ item }: { item: CaseSearchItem }) {
     : `${item.name} 商品画像`;
 
   return (
-    <div className="flex gap-3 pr-8">
+    <div className="flex gap-4 pr-8">
       {item.image_url ? (
         <ProductImage
           src={item.image_url}
           alt={imageAlt}
-          aspectClassName="mb-0 aspect-square w-20 shrink-0"
+          aspectClassName="mb-0 aspect-square w-28 shrink-0 sm:w-32"
           objectFit="contain"
         />
       ) : null}
