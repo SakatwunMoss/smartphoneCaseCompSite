@@ -13,7 +13,8 @@
     "test:rakuten": "tsx --env-file=.env.local scripts/api-test/rakuten-test.ts",
     "test:yahoo": "tsx --env-file=.env.local scripts/api-test/yahoo-test.ts",
     "sync:offers": "tsx --env-file=.env.local scripts/sync-offers/run.ts",
-    "sync:offers:ci": "tsx scripts/sync-offers/run.ts"
+    "sync:offers:ci": "tsx scripts/sync-offers/run.ts",
+    "generate:favicons": "tsx scripts/generate-favicons.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.112.3",
