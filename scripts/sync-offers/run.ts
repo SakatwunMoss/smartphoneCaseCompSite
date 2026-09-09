@@ -14,6 +14,7 @@
  */
 
 import { createClient } from "@supabase/supabase-js";
+import { isMatchingPhoneModel } from "./matcher";
 import { fetchRakutenOffers } from "./rakuten";
 import { fetchYahooOffers } from "./yahoo";
 
@@ -135,6 +136,28 @@ async function main() {
         yahooFailed = true;
         const msg = err instanceof Error ? err.message : String(err);
         console.error(`${phone.name}: Yahooエラー — ${msg}`);
+      }
+
+      const rakutenBefore = rakutenOffers.length;
+      const yahooBefore = yahooOffers.length;
+      rakutenOffers = rakutenOffers.filter((o) =>
+        isMatchingPhoneModel(phone.name, o.name),
+      );
+      yahooOffers = yahooOffers.filter((o) =>
+        isMatchingPhoneModel(phone.name, o.name),
+      );
+      const rakutenExcluded = rakutenBefore - rakutenOffers.length;
+      const yahooExcluded = yahooBefore - yahooOffers.length;
+
+      if (rakutenExcluded > 0) {
+        console.log(
+          `${phone.name}: 楽天${rakutenBefore}件中${rakutenExcluded}件を機種名不一致で除外`,
+        );
+      }
+      if (yahooExcluded > 0) {
+        console.log(
+          `${phone.name}: Yahoo${yahooBefore}件中${yahooExcluded}件を機種名不一致で除外`,
+        );
       }
 
       const fetchedAt = new Date().toISOString();
