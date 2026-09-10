@@ -5,6 +5,17 @@ on:
     # 毎日 日本時間 午前4時（UTC 19:00）
     - cron: '0 19 * * *'
   workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'true にすると JSON export / commit&push をスキップ（同期自体は実行）'
+        required: false
+        default: 'false'
+
+# push では起動しない（JSON bot commit が同期を再トリガーしない）
+# ※ [skip ci] は付けない（Vercel の自動デプロイまで止まってしまうため）
+
+permissions:
+  contents: write
 
 jobs:
   sync-offers:
@@ -14,6 +25,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v5
@@ -35,3 +48,29 @@ jobs:
           VC_PID: ${{ secrets.VC_PID }}
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+
+      - name: Export catalog JSON
+        if: ${{ (github.event.inputs.dry_run || 'false') != 'true' }}
+        run: npm run export:catalog
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+
+      - name: Commit and push catalog.json
+        if: ${{ (github.event.inputs.dry_run || 'false') != 'true' }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/data/catalog.json
+          if git diff --staged --quiet; then
+            echo "No changes in catalog.json"
+            exit 0
+          fi
+          # [skip ci] は使わない（Vercel デプロイを止めないため）。
+          # 本 workflow は schedule / workflow_dispatch のみなので push では再起動しない。
+          git commit -m "$(cat <<'EOF'
+          chore(data): refresh catalog.json after offers sync
+
+          EOF
+          )"
+          git push

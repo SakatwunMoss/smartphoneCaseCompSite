@@ -1,15 +1,11 @@
-export const dynamic = "force-dynamic";
-
 import Link from "next/link";
 import { Suspense } from "react";
 import type { Metadata } from "next";
 
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { CaseSearchResults } from "@/components/CaseSearchResults";
-import type { CaseSearchItem } from "@/lib/case-search-filters";
+import { searchCases, searchPhones } from "@/lib/catalog";
 import { buildPageMetadata } from "@/lib/metadata";
-import { supabase } from "@/lib/supabase";
-import type { Case, MarketplaceOffer, Phone } from "@/types/database";
 
 type PageProps = {
   searchParams: Promise<{ q?: string | string[] }>;
@@ -43,80 +39,6 @@ function getQuery(q: string | string[] | undefined): string {
   return q?.trim() ?? "";
 }
 
-async function searchPhones(keyword: string): Promise<Phone[]> {
-  const { data, error } = await supabase
-    .from("phones")
-    .select("*")
-    .ilike("name", `%${keyword}%`);
-
-  if (error) {
-    console.error("Failed to search phones:", error);
-    return [];
-  }
-
-  return data ?? [];
-}
-
-async function searchOtherCases(keyword: string): Promise<CaseSearchItem[]> {
-  type CaseRow = Case & {
-    phones: Pick<Phone, "name"> | null;
-  };
-
-  const { data, error } = await supabase
-    .from("cases")
-    .select("*, phones(name)")
-    .or(`name.ilike.%${keyword}%,brand.ilike.%${keyword}%`);
-
-  if (error) {
-    console.error("Failed to search cases:", error);
-    return [];
-  }
-
-  return ((data as CaseRow[] | null) ?? []).map((row) => ({
-    id: row.id,
-    name: row.name,
-    brand: row.brand,
-    price: row.price,
-    phone_id: row.phone_id,
-    phone_name: row.phones?.name ?? null,
-    source: "other" as const,
-    url: row.url?.trim() || null,
-    image_url: row.image_url?.trim() || null,
-    review_rate: null,
-  }));
-}
-
-async function searchMarketplaceOffers(
-  keyword: string,
-): Promise<CaseSearchItem[]> {
-  type OfferRow = MarketplaceOffer & {
-    phones: Pick<Phone, "name"> | null;
-  };
-
-  const { data, error } = await supabase
-    .from("marketplace_offers")
-    .select("*, phones(name)")
-    .or(`name.ilike.%${keyword}%,brand.ilike.%${keyword}%`);
-
-  if (error) {
-    console.error("Failed to search marketplace offers:", error);
-    return [];
-  }
-
-  return ((data as OfferRow[] | null) ?? []).map((row) => ({
-    id: row.id,
-    name: row.name,
-    brand: row.brand,
-    price: row.price,
-    phone_id: row.phone_id,
-    phone_name: row.phones?.name ?? null,
-    source: row.source,
-    url: row.url?.trim() || null,
-    image_url: row.image_url?.trim() || null,
-    review_rate: row.review_rate,
-  }));
-}
-
 function caseCardClassName(): string {
   return "block rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition-all hover:border-orange-300 hover:shadow-md";
 }
@@ -145,13 +67,8 @@ export default async function SearchPage({ searchParams }: PageProps) {
     );
   }
 
-  const [phones, otherCases, marketplaceCases] = await Promise.all([
-    searchPhones(keyword),
-    searchOtherCases(keyword),
-    searchMarketplaceOffers(keyword),
-  ]);
-
-  const cases = [...otherCases, ...marketplaceCases];
+  const phones = searchPhones(keyword);
+  const cases = searchCases(keyword);
   const hasResults = phones.length > 0 || cases.length > 0;
 
   return (

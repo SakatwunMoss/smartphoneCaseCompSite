@@ -1,5 +1,3 @@
-export const dynamic = "force-dynamic";
-
 import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
@@ -10,10 +8,10 @@ import { JsonLd } from "@/components/JsonLd";
 import { PhoneFilterPanel } from "@/components/PhoneFilterPanel";
 import { ProductImage } from "@/components/ProductImage";
 import { columns } from "@/lib/columns";
+import { getPhoneFilterOptions, getPhones } from "@/lib/catalog";
 import { buildPhonesItemListJsonLd } from "@/lib/json-ld";
 import { buildPageMetadata } from "@/lib/metadata";
 import { parsePhoneFilters } from "@/lib/phone-filters";
-import { getPhoneFilterOptions, getPhones } from "@/lib/phones";
 
 const featuredColumns = columns.slice(0, 3);
 
@@ -33,10 +31,8 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function Home({ searchParams }: HomeProps) {
   const params = await searchParams;
   const filters = parsePhoneFilters(params);
-  const [{ phones, error }, { makers, years }] = await Promise.all([
-    getPhones(filters),
-    getPhoneFilterOptions(),
-  ]);
+  const { phones, error } = getPhones(filters);
+  const { makers, years } = getPhoneFilterOptions();
 
   const itemListJsonLd =
     phones && phones.length > 0 ? buildPhonesItemListJsonLd(phones) : null;

@@ -6,73 +6,28 @@ import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { CaseSourceTabs } from "@/components/CaseSourceTabs";
 import { JsonLd } from "@/components/JsonLd";
 import { PhoneDescription } from "@/components/PhoneDescription";
+import {
+  getMarketplaceOffers,
+  getOtherCases,
+  getPhone,
+  getStaticPhoneParams,
+} from "@/lib/catalog";
 import { buildPhoneCasesItemListJsonLd } from "@/lib/json-ld";
 import { buildPageMetadata } from "@/lib/metadata";
-import { supabase } from "@/lib/supabase";
-import type { Case, MarketplaceOffer, Phone } from "@/types/database";
 
 type PageProps = {
   params: Promise<{ id: string }>;
 };
 
-type PhoneDetail = Phone & {
-  description: string | null;
-};
-
-async function getPhone(id: string): Promise<PhoneDetail | null> {
-  const { data, error } = await supabase
-    .from("phones")
-    .select("id, name, maker, released_year, description")
-    .eq("id", id)
-    .maybeSingle();
-
-  if (error) {
-    console.error("Failed to fetch phone:", error);
-    return null;
-  }
-
-  return data as PhoneDetail | null;
-}
-
-async function getOtherCases(phoneId: string): Promise<Case[]> {
-  const { data, error } = await supabase
-    .from("cases")
-    .select("*")
-    .eq("phone_id", phoneId)
-    .order("price", { ascending: true });
-
-  if (error) {
-    console.error("Failed to fetch cases:", error);
-    return [];
-  }
-
-  return data ?? [];
-}
-
-async function getMarketplaceOffers(
-  phoneId: string,
-  source: "rakuten" | "yahoo",
-): Promise<MarketplaceOffer[]> {
-  const { data, error } = await supabase
-    .from("marketplace_offers")
-    .select("*")
-    .eq("phone_id", phoneId)
-    .eq("source", source)
-    .order("price", { ascending: true });
-
-  if (error) {
-    console.error(`Failed to fetch ${source} offers:`, error);
-    return [];
-  }
-
-  return (data ?? []) as MarketplaceOffer[];
+export function generateStaticParams() {
+  return getStaticPhoneParams();
 }
 
 export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
   const { id } = await params;
-  const phone = await getPhone(id);
+  const phone = getPhone(id);
 
   if (!phone) {
     return buildPageMetadata({
@@ -107,17 +62,15 @@ function CaseSourceTabsFallback() {
 
 export default async function PhoneDetailPage({ params }: PageProps) {
   const { id } = await params;
-  const phone = await getPhone(id);
+  const phone = getPhone(id);
 
   if (!phone) {
     notFound();
   }
 
-  const [otherCases, rakutenOffers, yahooOffers] = await Promise.all([
-    getOtherCases(id),
-    getMarketplaceOffers(id, "rakuten"),
-    getMarketplaceOffers(id, "yahoo"),
-  ]);
+  const otherCases = getOtherCases(id);
+  const rakutenOffers = getMarketplaceOffers(id, "rakuten");
+  const yahooOffers = getMarketplaceOffers(id, "yahoo");
 
   const casesItemListJsonLd = buildPhoneCasesItemListJsonLd(
     phone,

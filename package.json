@@ -14,6 +14,7 @@
     "test:yahoo": "tsx --env-file=.env.local scripts/api-test/yahoo-test.ts",
     "sync:offers": "tsx --env-file=.env.local scripts/sync-offers/run.ts",
     "sync:offers:ci": "tsx scripts/sync-offers/run.ts",
+    "export:catalog": "node scripts/export-catalog-json.mjs",
     "generate:favicons": "tsx scripts/generate-favicons.ts"
   },
   "dependencies": {

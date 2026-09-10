@@ -1,19 +1,12 @@
 import type { MetadataRoute } from "next";
 
+import { getAllCatalogPhones } from "@/lib/catalog";
 import { columns } from "@/lib/columns";
-import { supabase } from "@/lib/supabase";
-import type { Phone } from "@/types/database";
 
 const BASE_URL = "https://smartphone-case-comp-site.vercel.app";
 
-export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const { data, error } = await supabase.from("phones").select("*");
-
-  if (error) {
-    console.error("Failed to fetch phones for sitemap:", error);
-  }
-
-  const phones: Phone[] = data ?? [];
+export default function sitemap(): MetadataRoute.Sitemap {
+  const phones = getAllCatalogPhones();
   const now = new Date();
 
   const staticPages: MetadataRoute.Sitemap = [
