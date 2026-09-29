@@ -8,6 +8,8 @@ import {
   BilingualText,
 } from "@/components/BilingualText";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
+import { DiagnoseCta } from "@/components/DiagnoseCta";
+import { DiagnosePromoBanner } from "@/components/DiagnosePromoBanner";
 import { JsonLd } from "@/components/JsonLd";
 import { PhoneFilterPanel } from "@/components/PhoneFilterPanel";
 import { ProductImage } from "@/components/ProductImage";
@@ -56,15 +58,23 @@ export default async function Home({ searchParams }: HomeProps) {
           sizes="100vw"
           className="h-auto w-full"
         />
-        <div className="bg-white px-6 py-3 text-center sm:py-3.5">
+        <div className="bg-white px-6 py-5 text-center sm:py-6">
           <h1 id="hero-heading" className="sr-only">
             PHONE CASE COMPARE
           </h1>
           <p className="text-sm text-gray-700 sm:text-base">
             気になる端末のケースを比較しよう
           </p>
+          <div className="mt-4 flex flex-col items-center gap-2">
+            <DiagnoseCta variant="hero" />
+            <p className="text-xs text-gray-500 sm:text-sm">
+              質問に答えるだけ・登録不要
+            </p>
+          </div>
         </div>
       </section>
+
+      <DiagnosePromoBanner />
 
       <div className="px-6 py-10">
         <main className="mx-auto w-full max-w-6xl">

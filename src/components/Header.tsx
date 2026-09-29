@@ -4,11 +4,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 
+import { DiagnoseCta, DIAGNOSE_PATH } from "@/components/DiagnoseCta";
 import { SearchBox } from "@/components/SearchBox";
 
 const NAV_LINKS = [
   { href: "/", label: "ホーム" },
-  { href: "/diagnose", label: "好み診断" },
   { href: "/columns", label: "コラム" },
   { href: "/about", label: "サイトについて" },
 ] as const;
@@ -23,6 +23,7 @@ function isActivePath(pathname: string, href: string) {
 export function Header() {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
+  const diagnoseActive = isActivePath(pathname, DIAGNOSE_PATH);
 
   function closeMenu() {
     setMenuOpen(false);
@@ -41,7 +42,7 @@ export function Header() {
 
         <nav
           aria-label="メインナビゲーション"
-          className="hidden items-center gap-5 md:flex"
+          className="hidden items-center gap-4 md:flex"
         >
           {NAV_LINKS.map(({ href, label }) => {
             const active = isActivePath(pathname, href);
@@ -60,6 +61,13 @@ export function Header() {
               </Link>
             );
           })}
+          <DiagnoseCta
+            variant="nav"
+            className={
+              diagnoseActive ? "ring-2 ring-orange-300 ring-offset-1" : ""
+            }
+            aria-current={diagnoseActive ? "page" : undefined}
+          />
         </nav>
 
         <div className="ml-auto hidden min-w-0 w-full max-w-md md:block">
@@ -113,6 +121,14 @@ export function Header() {
           className="border-t border-amber-100/80 px-6 py-3 md:hidden"
         >
           <ul className="flex flex-col gap-1">
+            <li className="mb-1">
+              <DiagnoseCta
+                variant="nav"
+                className="w-full min-h-11 rounded-full text-center"
+                onClick={closeMenu}
+                aria-current={diagnoseActive ? "page" : undefined}
+              />
+            </li>
             {NAV_LINKS.map(({ href, label }) => {
               const active = isActivePath(pathname, href);
               return (

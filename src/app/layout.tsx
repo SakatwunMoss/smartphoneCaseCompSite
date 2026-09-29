@@ -4,6 +4,7 @@ import Script from "next/script";
 import { Analytics } from "@vercel/analytics/next";
 import { Suspense } from "react";
 
+import { DiagnoseFloatingCta } from "@/components/DiagnoseFloatingCta";
 import { Footer } from "@/components/Footer";
 import { GoogleAnalyticsPageView } from "@/components/GoogleAnalytics";
 import { Header } from "@/components/Header";
@@ -105,6 +106,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <Header />
         {children}
         <Footer />
+        <DiagnoseFloatingCta />
         <Analytics />
       </body>
     </html>
