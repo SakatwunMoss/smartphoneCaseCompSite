@@ -3,17 +3,23 @@ import Link from "next/link";
 import { Suspense } from "react";
 import type { Metadata } from "next";
 
+import {
+  BilingualButtonLabel,
+  BilingualText,
+} from "@/components/BilingualText";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { JsonLd } from "@/components/JsonLd";
 import { PhoneFilterPanel } from "@/components/PhoneFilterPanel";
 import { ProductImage } from "@/components/ProductImage";
 import { columns } from "@/lib/columns";
 import { getPhoneFilterOptions, getPhones } from "@/lib/catalog";
+import { diagnoseCopy } from "@/lib/diagnose/copy";
 import { buildPhonesItemListJsonLd } from "@/lib/json-ld";
 import { buildPageMetadata } from "@/lib/metadata";
 import { parsePhoneFilters } from "@/lib/phone-filters";
 
 const featuredColumns = columns.slice(0, 3);
+const { home: homeCopy } = diagnoseCopy;
 
 type HomeProps = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
@@ -117,6 +123,41 @@ export default async function Home({ searchParams }: HomeProps) {
               条件に一致する端末がありません
             </p>
           )}
+
+          <section
+            aria-labelledby="diagnose-promo-heading"
+            className="mt-14 rounded-xl border border-orange-200 bg-orange-50 px-5 py-8 sm:px-8 sm:py-10"
+          >
+            <BilingualText
+              copy={homeCopy.promoEyebrow}
+              size="xs"
+              enClassName="font-medium tracking-wide text-orange-700"
+              jaClassName="!text-orange-700/75"
+            />
+            <BilingualText
+              as="h2"
+              id="diagnose-promo-heading"
+              copy={homeCopy.promoTitle}
+              size="2xl"
+              className="mt-2"
+              enClassName="text-gray-900"
+              jaClassName="!text-gray-600"
+            />
+            <BilingualText
+              as="p"
+              copy={homeCopy.promoBody}
+              size="sm"
+              className="mt-3 max-w-2xl"
+              enClassName="text-gray-600 sm:text-base"
+              jaClassName="!text-gray-500"
+            />
+            <Link
+              href="/diagnose"
+              className="mt-6 inline-flex min-h-[3.25rem] w-full items-center justify-center rounded-xl bg-orange-500 px-6 py-2.5 text-white transition-colors hover:bg-orange-600 sm:w-auto"
+            >
+              <BilingualButtonLabel inverted copy={homeCopy.promoCta} />
+            </Link>
+          </section>
 
           <section
             aria-labelledby="columns-heading"

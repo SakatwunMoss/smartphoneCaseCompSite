@@ -1,5 +1,6 @@
 import catalogData from "@/data/catalog.json";
 import type { CaseSearchItem } from "@/lib/case-search-filters";
+import { normalizeSearchText } from "@/lib/normalize-search";
 import type { PhoneFilters } from "@/lib/phone-filters";
 import type {
   Case,
@@ -25,20 +26,7 @@ export type Catalog = {
 
 const catalog = catalogData as Catalog;
 
-/**
- * 検索用正規化:
- * - NFKC（全角英数→半角など）
- * - ASCII 大小無視
- * - ひらがな→カタカナ（読みのゆれを吸収）
- */
-export function normalizeSearchText(value: string): string {
-  return value
-    .normalize("NFKC")
-    .toLocaleLowerCase("en-US")
-    .replace(/[\u3041-\u3096]/g, (ch) =>
-      String.fromCharCode(ch.charCodeAt(0) + 0x60),
-    );
-}
+export { normalizeSearchText };
 
 function matchesNormalizedField(
   field: string | null | undefined,
