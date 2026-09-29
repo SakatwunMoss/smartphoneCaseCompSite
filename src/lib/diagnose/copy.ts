@@ -173,12 +173,28 @@ export const diagnoseCopy = {
       ja: "条件に合うケースが見つかりませんでした。条件を変えてもう一度お試しください。",
     } satisfies BilingualCopy,
     relaxed: {
-      en: "Few exact matches — showing close recommendations",
-      ja: "条件に完全一致するものが少なかったため、近いものを表示しています",
+      en: "We found fewer perfect matches, so here are close recommendations too",
+      ja: "条件にぴったりのケースが少なかったため、近い条件のケースも合わせてご紹介します",
     } satisfies BilingualCopy,
     relaxedPrefix: {
-      en: "Relaxed",
-      ja: "緩和",
+      en: "Adjusted",
+      ja: "調整した条件",
+    } satisfies BilingualCopy,
+    exactSection: {
+      en: "Best matches",
+      ja: "ぴったりのケース",
+    } satisfies BilingualCopy,
+    nearSection: {
+      en: "Also recommended",
+      ja: "こちらもおすすめ",
+    } satisfies BilingualCopy,
+    budgetHigher: {
+      en: "A bit over budget",
+      ja: "予算より少し高め",
+    } satisfies BilingualCopy,
+    budgetLower: {
+      en: "A bit under budget",
+      ja: "予算より少し安め",
     } satisfies BilingualCopy,
     count: (n: number): BilingualCopy => ({
       en: `${n} picks (by score)`,
@@ -245,11 +261,18 @@ export const diagnoseCopy = {
     } satisfies BilingualCopy,
   },
   relaxedFilters: {
-    caseTypes: {
-      en: "Case style",
-      ja: "ケースタイプ",
+    budgetNear: {
+      en: "Nearby budget (±1)",
+      ja: "近い予算帯も含んでいます",
     } satisfies BilingualCopy,
-    budget: { en: "Budget", ja: "予算" } satisfies BilingualCopy,
+    caseTypes: {
+      en: "Case style widened",
+      ja: "ケースタイプの条件を外しています",
+    } satisfies BilingualCopy,
+    budget: {
+      en: "Budget fully opened",
+      ja: "予算の条件を外しています",
+    } satisfies BilingualCopy,
   },
   meta: {
     title: { en: "Find Your Match", ja: "好み診断" } satisfies BilingualCopy,

@@ -1,6 +1,7 @@
 /**
  * 商品名からケースのタイプ・特徴を推定するユーティリティ。
- * cases テーブルにタイプ列がないため、キーワードマッチで判定する（案A）。
+ * cases / marketplace_offers にタイプ列がないため、キーワードマッチで判定する。
+ * 将来 description / category が取れる場合は extras に渡す。
  */
 
 import type { CaseTypeId, PriorityId } from "@/lib/diagnose/questions";
@@ -25,13 +26,49 @@ const TYPE_KEYWORDS: Record<InferredCaseType, readonly string[]> = {
     "TOUGH",
     "タフ",
     "ハイブリッド",
+    "ハイブリット",
     "衝撃",
+    "2重構造",
+    "二重構造",
+    "ハードケース",
+    "ハードカバー",
+    "全面保護",
+    "ポリカーボネート",
+    "polycarbonate",
   ],
   folio: ["手帳", "フリップ", "財布型", "FOLIO", "folio", "フラップ"],
-  clear: ["クリア", "透明", "クリスタル", "オールクリア"],
-  silicone: ["シリコン", "Silicone", "ソフト", "ソフトカバー"],
-  leather: ["レザー", "本革", "PUレザー", "leather"],
-  strap: ["ストラップ", "ハンドストラップ", "ストラップホール"],
+  clear: [
+    "クリア",
+    "透明",
+    "クリスタル",
+    "オールクリア",
+    "スケルトン",
+    "半透明",
+    "フロスト",
+    "アクリル",
+  ],
+  silicone: [
+    "シリコン",
+    "Silicone",
+    "ソフト",
+    "ソフトカバー",
+    "ソフトケース",
+    "TPU",
+    "tpu",
+    "ラバー",
+    "rubber",
+    "柔軟",
+    "iFace",
+    "iface",
+  ],
+  leather: ["レザー", "本革", "PUレザー", "leather", "革製", "キルティング"],
+  strap: [
+    "ストラップ",
+    "ハンドストラップ",
+    "ストラップホール",
+    "ショルダー",
+    "スマホショルダー",
+  ],
 };
 
 const FEATURE_KEYWORDS: Record<InferredFeature, readonly string[]> = {
@@ -45,6 +82,7 @@ const FEATURE_KEYWORDS: Record<InferredFeature, readonly string[]> = {
     "保護",
     "落下",
     "衝撃",
+    "全面保護",
   ],
   thin_light: ["薄型", "薄さ", "軽量", "ULTRASLIM", "スリム", "lite", "Lite"],
   design: [
@@ -56,6 +94,14 @@ const FEATURE_KEYWORDS: Record<InferredFeature, readonly string[]> = {
     "マット",
     "グロス",
     "ファッション",
+    "おしゃれ",
+    "かわいい",
+    "可愛い",
+    "韓国",
+    "ウェーブ",
+    "グラデーション",
+    "メッキ",
+    "メタリック",
   ],
   utility: [
     "スタンド",
@@ -65,6 +111,10 @@ const FEATURE_KEYWORDS: Record<InferredFeature, readonly string[]> = {
     "リング",
     "キックスタンド",
     "収納",
+    "リング付き",
+    "リング付",
+    "スライド式",
+    "冷却",
   ],
   magsafe: [
     "MagSafe",
@@ -77,6 +127,8 @@ const FEATURE_KEYWORDS: Record<InferredFeature, readonly string[]> = {
     "PixelSnap",
     "ワイヤレス充電",
     "磁力",
+    "磁気充電",
+    "マグネット式",
   ],
 };
 
@@ -100,15 +152,16 @@ function collectHits<T extends string>(
 }
 
 /**
- * 商品名・ブランドからタイプと特徴を推定する。
- * brand も結合して MagSafe 表記漏れなどを拾う。
+ * 商品名・ブランド・追加テキストからタイプと特徴を推定する。
+ * extras には marketplace の説明文・カテゴリ・別名などを渡せる。
  */
 export function inferCaseTraits(
   name: string,
   brand?: string | null,
+  extras?: string | null,
 ): CaseTraits {
-  const corpus = [name, brand]
-    .filter((part): part is string => Boolean(part))
+  const corpus = [name, brand, extras]
+    .filter((part): part is string => Boolean(part && part.trim()))
     .join(" ");
   return {
     types: collectHits(corpus, TYPE_KEYWORDS),

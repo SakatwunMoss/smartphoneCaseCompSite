@@ -11,7 +11,7 @@ import { ProductImage } from "@/components/ProductImage";
 import { AFFILIATE_LINK_REL } from "@/lib/affiliate";
 import { MAX_COMPARE_SELECTION } from "@/lib/comparable";
 import { buildPhoneCompareHref } from "@/lib/compare-query";
-import { diagnoseCopy } from "@/lib/diagnose/copy";
+import { diagnoseCopy, type BilingualCopy } from "@/lib/diagnose/copy";
 import type { RecommendResult, ScoredCase } from "@/lib/diagnose/scoring";
 
 const { results: resultsCopy } = diagnoseCopy;
@@ -44,7 +44,7 @@ export function DiagnoseResults({
   onRestart,
   onEditAnswers,
 }: DiagnoseResultsProps) {
-  const { items, relaxed, relaxedFilters } = result;
+  const { items, exactItems, nearItems, relaxed, relaxedFilters } = result;
 
   const compareCount = Math.min(items.length, MAX_COMPARE_SELECTION);
   const compareHref =
@@ -95,6 +95,8 @@ export function DiagnoseResults({
     );
   }
 
+  const showSections = exactItems.length > 0 && nearItems.length > 0;
+
   return (
     <div>
       {relaxed ? (
@@ -109,19 +111,13 @@ export function DiagnoseResults({
             jaClassName="!text-amber-900/80"
           />
           {relaxedFilters.length > 0 ? (
-            <p className="mt-1 text-xs leading-relaxed text-amber-900/90">
-              <span lang="en">
-                ({resultsCopy.relaxedPrefix.en}:{" "}
-                {relaxedFilters.map((f) => f.en).join(" → ")})
-              </span>
-              <span className="mx-1.5 text-amber-700/50" aria-hidden>
-                /
-              </span>
-              <span lang="ja">
-                （{resultsCopy.relaxedPrefix.ja}:{" "}
-                {relaxedFilters.map((f) => f.ja).join(" → ")}）
-              </span>
-            </p>
+            <ul className="mt-2 flex flex-wrap gap-1.5" aria-label="調整した条件">
+              {relaxedFilters.map((filter) => (
+                <li key={`${filter.en}-${filter.ja}`}>
+                  <RelaxedTag copy={filter} />
+                </li>
+              ))}
+            </ul>
           ) : null}
         </div>
       ) : null}
@@ -164,17 +160,92 @@ export function DiagnoseResults({
         </div>
       </div>
 
-      <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        {items.map((item, index) => (
-          <ResultCard key={item.caseItem.id} item={item} rank={index + 1} />
-        ))}
-      </ul>
+      {showSections ? (
+        <div className="space-y-10">
+          <ResultSection
+            heading={resultsCopy.exactSection}
+            items={exactItems}
+            rankOffset={0}
+          />
+          <ResultSection
+            heading={resultsCopy.nearSection}
+            items={nearItems}
+            rankOffset={exactItems.length}
+          />
+        </div>
+      ) : (
+        <ResultSection
+          heading={
+            nearItems.length > 0 && exactItems.length === 0
+              ? resultsCopy.nearSection
+              : null
+          }
+          items={items}
+          rankOffset={0}
+        />
+      )}
     </div>
   );
 }
 
+function RelaxedTag({ copy }: { copy: BilingualCopy }) {
+  return (
+    <span className="inline-flex items-center rounded-full border border-amber-300/80 bg-white/80 px-2.5 py-0.5 text-[11px] leading-relaxed text-amber-950">
+      <span lang="en">{copy.en}</span>
+      <span className="mx-1 text-amber-700/40" aria-hidden>
+        /
+      </span>
+      <span lang="ja">{copy.ja}</span>
+    </span>
+  );
+}
+
+function ResultSection({
+  heading,
+  items,
+  rankOffset,
+}: {
+  heading: BilingualCopy | null;
+  items: ScoredCase[];
+  rankOffset: number;
+}) {
+  if (items.length === 0) {
+    return null;
+  }
+
+  return (
+    <section>
+      {heading ? (
+        <BilingualText
+          as="h2"
+          copy={heading}
+          size="lg"
+          className="mb-4"
+          enClassName="font-semibold text-gray-900"
+          jaClassName="!text-gray-600"
+        />
+      ) : null}
+      <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        {items.map((item, index) => (
+          <ResultCard
+            key={item.caseItem.id}
+            item={item}
+            rank={rankOffset + index + 1}
+          />
+        ))}
+      </ul>
+    </section>
+  );
+}
+
 function ResultCard({ item, rank }: { item: ScoredCase; rank: number }) {
-  const { caseItem, score, reasonLine } = item;
+  const { caseItem, score, reasonLine, budgetDeviation } = item;
+  const budgetNote =
+    budgetDeviation === "higher"
+      ? resultsCopy.budgetHigher
+      : budgetDeviation === "lower"
+        ? resultsCopy.budgetLower
+        : null;
 
   return (
     <li>
@@ -235,6 +306,16 @@ function ResultCard({ item, rank }: { item: ScoredCase; rank: number }) {
               </dd>
             </div>
           </dl>
+
+          {budgetNote ? (
+            <p className="mb-3 text-xs text-gray-500">
+              <span lang="en">{budgetNote.en}</span>
+              <span className="mx-1 text-gray-300" aria-hidden>
+                /
+              </span>
+              <span lang="ja">{budgetNote.ja}</span>
+            </p>
+          ) : null}
 
           <div className="mb-4 rounded-lg bg-orange-50/70 px-3 py-2">
             <BilingualText
