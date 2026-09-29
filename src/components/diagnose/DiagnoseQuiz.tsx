@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  useEffect,
   useMemo,
   useRef,
   useState,
@@ -14,6 +15,12 @@ import {
 } from "@/components/BilingualText";
 import { DiagnoseResults } from "@/components/diagnose/DiagnoseResults";
 import { diagnoseCopy, type BilingualCopy } from "@/lib/diagnose/copy";
+import {
+  clearDiagnoseState,
+  isMeaningfulPersistedState,
+  loadDiagnoseState,
+  saveDiagnoseState,
+} from "@/lib/diagnose/persist";
 import {
   BUDGET_OPTIONS,
   CASE_TYPE_OPTIONS,
@@ -32,7 +39,8 @@ import type { Case, Phone } from "@/types/database";
 
 const QUIZ_SCROLL_MARGIN_CLASS = "scroll-mt-20";
 
-const { quiz: quizCopy, results: resultsCopy } = diagnoseCopy;
+const { quiz: quizCopy, results: resultsCopy, resume: resumeCopy } =
+  diagnoseCopy;
 
 export type DiagnosePhoneOption = Pick<Phone, "id" | "name" | "maker">;
 
@@ -45,8 +53,39 @@ export function DiagnoseQuiz({ phones, cases }: DiagnoseQuizProps) {
   const [stepIndex, setStepIndex] = useState(0);
   const [draft, setDraft] = useState<DraftAnswers>(createInitialDraft);
   const [finished, setFinished] = useState(false);
+  const [storageReady, setStorageReady] = useState(false);
+  const [showResumeBanner, setShowResumeBanner] = useState(false);
   const questionTopRef = useRef<HTMLDivElement>(null);
   const resultsTopRef = useRef<HTMLDivElement>(null);
+
+  const phoneIds = useMemo(
+    () => new Set(phones.map((phone) => phone.id)),
+    [phones],
+  );
+
+  useEffect(() => {
+    // sessionStorage はクライアント専用。同期 setState を避けるため次ティックで復元する。
+    const timer = window.setTimeout(() => {
+      const loaded = loadDiagnoseState(phoneIds);
+      if (loaded && isMeaningfulPersistedState(loaded)) {
+        setDraft(loaded.draft);
+        setStepIndex(loaded.stepIndex);
+        setFinished(loaded.finished);
+        setShowResumeBanner(true);
+      } else if (loaded) {
+        clearDiagnoseState();
+      }
+      setStorageReady(true);
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, [phoneIds]);
+
+  useEffect(() => {
+    if (!storageReady) {
+      return;
+    }
+    saveDiagnoseState({ draft, stepIndex, finished });
+  }, [draft, stepIndex, finished, storageReady]);
 
   const step = QUIZ_STEPS[stepIndex];
   const progress = finished
@@ -79,9 +118,19 @@ export function DiagnoseQuiz({ phones, cases }: DiagnoseQuizProps) {
   }
 
   function restart() {
+    clearDiagnoseState();
     setDraft(createInitialDraft());
     setStepIndex(0);
     setFinished(false);
+    setShowResumeBanner(false);
+    requestAnimationFrame(() => scrollTo(questionTopRef.current));
+  }
+
+  /** draft を保持したまま最後の質問へ戻る（restart とは別） */
+  function editAnswers() {
+    setFinished(false);
+    setStepIndex(QUIZ_STEPS.length - 1);
+    setShowResumeBanner(false);
     requestAnimationFrame(() => scrollTo(questionTopRef.current));
   }
 
@@ -96,21 +145,47 @@ export function DiagnoseQuiz({ phones, cases }: DiagnoseQuizProps) {
   }
 
   function goBack() {
-    if (finished) {
-      setFinished(false);
-      setStepIndex(QUIZ_STEPS.length - 1);
-      requestAnimationFrame(() => scrollTo(questionTopRef.current));
-      return;
-    }
     setStepIndex((i) => Math.max(0, i - 1));
     requestAnimationFrame(() => scrollTo(questionTopRef.current));
   }
 
   const canProceed = isStepComplete(step, draft);
 
+  if (!storageReady) {
+    return (
+      <div
+        className="min-h-[12rem]"
+        aria-busy="true"
+        aria-label="Loading"
+      />
+    );
+  }
+
+  const resumeBanner = showResumeBanner ? (
+    <div
+      role="status"
+      className="mb-6 flex flex-col gap-3 rounded-xl border border-orange-200 bg-orange-50/70 px-4 py-3 sm:flex-row sm:items-center sm:justify-between"
+    >
+      <BilingualText
+        copy={resumeCopy.banner}
+        size="sm"
+        enClassName="text-orange-950"
+        jaClassName="!text-orange-900/80"
+      />
+      <button
+        type="button"
+        onClick={restart}
+        className="inline-flex min-h-[2.75rem] shrink-0 items-center justify-center rounded-xl border border-orange-200 bg-white px-4 py-2 text-orange-800 transition-colors hover:border-orange-300 hover:bg-orange-50"
+      >
+        <BilingualButtonLabel copy={resumeCopy.startOver} />
+      </button>
+    </div>
+  ) : null;
+
   if (finished && result && selectedPhone) {
     return (
       <div ref={resultsTopRef} className={QUIZ_SCROLL_MARGIN_CLASS}>
+        {resumeBanner}
         <header className="mb-8">
           <BilingualText
             as="h1"
@@ -132,6 +207,7 @@ export function DiagnoseQuiz({ phones, cases }: DiagnoseQuizProps) {
           phoneId={selectedPhone.id}
           phoneName={selectedPhone.name}
           onRestart={restart}
+          onEditAnswers={editAnswers}
         />
       </div>
     );
@@ -139,6 +215,7 @@ export function DiagnoseQuiz({ phones, cases }: DiagnoseQuizProps) {
 
   return (
     <div>
+      {resumeBanner}
       <header className="mb-8">
         <BilingualText
           as="h1"
@@ -192,14 +269,22 @@ export function DiagnoseQuiz({ phones, cases }: DiagnoseQuizProps) {
         />
 
         <div className="mt-8 flex flex-wrap items-center gap-3">
-          <button
-            type="button"
-            onClick={goBack}
-            disabled={stepIndex === 0}
-            className="inline-flex min-h-[3rem] items-center justify-center rounded-xl border border-gray-200 bg-white px-4 py-2 text-gray-700 transition-colors hover:border-gray-300 disabled:cursor-not-allowed disabled:opacity-40"
-          >
-            <BilingualButtonLabel copy={quizCopy.back} />
-          </button>
+          {stepIndex === 0 ? (
+            <span
+              className="invisible inline-flex min-h-[3rem] items-center justify-center rounded-xl border border-gray-200 px-4 py-2"
+              aria-hidden
+            >
+              <BilingualButtonLabel copy={quizCopy.back} />
+            </span>
+          ) : (
+            <button
+              type="button"
+              onClick={goBack}
+              className="inline-flex min-h-[3rem] items-center justify-center rounded-xl border border-gray-200 bg-white px-4 py-2 text-gray-700 transition-colors hover:border-gray-300"
+            >
+              <BilingualButtonLabel copy={quizCopy.back} />
+            </button>
+          )}
           <button
             type="button"
             onClick={goNext}

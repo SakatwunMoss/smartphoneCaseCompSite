@@ -9,6 +9,7 @@ import {
   CompareSelectionBar,
 } from "@/components/ProductCompare";
 import { ProductImage } from "@/components/ProductImage";
+import { AFFILIATE_LINK_REL } from "@/lib/affiliate";
 import { CASE_SEARCH_SOURCE_LABEL } from "@/lib/case-search-filters";
 import type { CaseSearchItem } from "@/lib/case-search-filters";
 import {
@@ -162,7 +163,7 @@ export function SearchResultsWithCompare({
                   <a
                     href={caseItem.url}
                     target="_blank"
-                    rel="noopener noreferrer"
+                    rel={AFFILIATE_LINK_REL}
                     className="block h-full"
                   >
                     <CaseCardContent item={caseItem} />

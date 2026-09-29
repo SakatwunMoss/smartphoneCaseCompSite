@@ -8,6 +8,9 @@ import {
   BilingualText,
 } from "@/components/BilingualText";
 import { ProductImage } from "@/components/ProductImage";
+import { AFFILIATE_LINK_REL } from "@/lib/affiliate";
+import { MAX_COMPARE_SELECTION } from "@/lib/comparable";
+import { buildPhoneCompareHref } from "@/lib/compare-query";
 import { diagnoseCopy } from "@/lib/diagnose/copy";
 import type { RecommendResult, ScoredCase } from "@/lib/diagnose/scoring";
 
@@ -20,11 +23,18 @@ function formatPrice(price: number | null | undefined): string {
   return `¥${price.toLocaleString("ja-JP")}`;
 }
 
+const secondaryButtonClassName =
+  "inline-flex min-h-[3rem] items-center justify-center rounded-xl border border-orange-200 bg-white px-4 py-2 text-orange-800 transition-colors hover:border-orange-300 hover:bg-orange-50";
+
+const textButtonClassName =
+  "inline-flex min-h-[3rem] items-center justify-center px-2 py-2 text-sm text-gray-500 underline-offset-2 transition-colors hover:text-orange-700 hover:underline";
+
 type DiagnoseResultsProps = {
   result: RecommendResult;
   phoneId: string;
   phoneName: string;
   onRestart: () => void;
+  onEditAnswers: () => void;
 };
 
 export function DiagnoseResults({
@@ -32,8 +42,22 @@ export function DiagnoseResults({
   phoneId,
   phoneName,
   onRestart,
+  onEditAnswers,
 }: DiagnoseResultsProps) {
   const { items, relaxed, relaxedFilters } = result;
+
+  const compareCount = Math.min(items.length, MAX_COMPARE_SELECTION);
+  const compareHref =
+    items.length >= 2
+      ? buildPhoneCompareHref(
+          phoneId,
+          items.slice(0, compareCount).map((item) => item.caseItem.id),
+        )
+      : `/phones/${phoneId}`;
+  const compareLabel =
+    items.length >= 2
+      ? resultsCopy.compareTop(compareCount)
+      : resultsCopy.viewPhone;
 
   if (items.length === 0) {
     return (
@@ -45,13 +69,28 @@ export function DiagnoseResults({
           className="items-center"
           enClassName="text-gray-600"
         />
-        <button
-          type="button"
-          onClick={onRestart}
-          className="mt-6 inline-flex min-h-[3rem] items-center justify-center rounded-xl bg-orange-500 px-5 py-2 text-white transition-colors hover:bg-orange-600"
-        >
-          <BilingualButtonLabel inverted copy={resultsCopy.restart} />
-        </button>
+        <div className="mt-6 flex flex-col items-center gap-3 sm:flex-row sm:flex-wrap sm:justify-center">
+          <button
+            type="button"
+            onClick={onEditAnswers}
+            className={secondaryButtonClassName}
+          >
+            <BilingualButtonLabel copy={resultsCopy.editAnswers} />
+          </button>
+          <Link
+            href={`/phones/${phoneId}`}
+            className={secondaryButtonClassName}
+          >
+            <BilingualButtonLabel copy={resultsCopy.viewPhonePage} />
+          </Link>
+          <button
+            type="button"
+            onClick={onRestart}
+            className={textButtonClassName}
+          >
+            <BilingualButtonLabel copy={resultsCopy.restart} />
+          </button>
+        </div>
       </div>
     );
   }
@@ -87,6 +126,14 @@ export function DiagnoseResults({
         </div>
       ) : null}
 
+      <BilingualText
+        as="p"
+        copy={resultsCopy.guidance}
+        size="sm"
+        className="mb-6 max-w-2xl"
+        enClassName="text-gray-600"
+      />
+
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <BilingualText
@@ -96,17 +143,21 @@ export function DiagnoseResults({
           />
           <p className="mt-1 text-sm text-gray-500">{phoneName}</p>
         </div>
-        <div className="flex flex-wrap gap-2">
-          <Link
-            href={`/phones/${phoneId}`}
-            className="inline-flex min-h-[3rem] items-center justify-center rounded-xl bg-orange-500 px-4 py-2 text-white transition-colors hover:bg-orange-600"
-          >
-            <BilingualButtonLabel inverted copy={resultsCopy.viewPhone} />
+        <div className="flex flex-wrap items-center gap-2">
+          <Link href={compareHref} className={secondaryButtonClassName}>
+            <BilingualButtonLabel copy={compareLabel} />
           </Link>
           <button
             type="button"
+            onClick={onEditAnswers}
+            className={secondaryButtonClassName}
+          >
+            <BilingualButtonLabel copy={resultsCopy.editAnswers} />
+          </button>
+          <button
+            type="button"
             onClick={onRestart}
-            className="inline-flex min-h-[3rem] items-center justify-center rounded-xl border border-orange-200 bg-white px-4 py-2 text-orange-800 transition-colors hover:border-orange-300 hover:bg-orange-50"
+            className={textButtonClassName}
           >
             <BilingualButtonLabel copy={resultsCopy.restart} />
           </button>
@@ -139,16 +190,21 @@ function ResultCard({ item, rank }: { item: ScoredCase; rank: number }) {
 
         <div className="flex flex-1 flex-col p-4">
           {caseItem.image_url ? (
-            <ProductImage
-              src={caseItem.image_url}
-              alt={
-                caseItem.brand
-                  ? `${caseItem.brand} ${caseItem.name} 商品画像`
-                  : `${caseItem.name} 商品画像`
-              }
-              aspectClassName="aspect-square mx-auto w-3/4"
-              objectFit="contain"
-            />
+            <a
+              href={caseItem.url}
+              target="_blank"
+              rel={AFFILIATE_LINK_REL}
+              tabIndex={-1}
+              aria-hidden
+              className="block"
+            >
+              <ProductImage
+                src={caseItem.image_url}
+                alt=""
+                aspectClassName="aspect-square mx-auto w-3/4"
+                objectFit="contain"
+              />
+            </a>
           ) : null}
 
           <h3 className="mb-2 text-lg font-medium tracking-tight text-gray-900">
@@ -196,16 +252,16 @@ function ResultCard({ item, rank }: { item: ScoredCase; rank: number }) {
             />
           </div>
 
-          <div className="mt-auto flex items-center gap-2">
-            <AffiliateBadge />
+          <div className="mt-auto flex flex-col gap-2 sm:flex-row sm:items-center">
             <a
               href={caseItem.url}
               target="_blank"
-              rel="noopener noreferrer"
-              className="inline-block text-sm font-medium text-orange-500 underline-offset-2 transition-colors hover:text-orange-600 hover:underline"
+              rel={AFFILIATE_LINK_REL}
+              className="inline-flex min-h-[3rem] w-full items-center justify-center rounded-xl bg-orange-500 px-5 py-2 text-white transition-colors hover:bg-orange-600 sm:w-auto"
             >
-              {resultsCopy.buyLink.ja} →
+              <BilingualButtonLabel inverted copy={resultsCopy.buyLink} />
             </a>
+            <AffiliateBadge />
           </div>
         </div>
       </article>

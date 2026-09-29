@@ -164,6 +164,10 @@ export const diagnoseCopy = {
       en: "Here are scored picks based on your answers.",
       ja: "回答をもとにスコアリングしたおすすめケースです。",
     } satisfies BilingualCopy,
+    guidance: {
+      en: "Open a purchase link for a case you like, or compare other cases on the phone page.",
+      ja: "気になるケースの購入先を開くか、端末ページでほかのケースと比較できます。",
+    } satisfies BilingualCopy,
     empty: {
       en: "No matches found. Try changing your answers and run the quiz again.",
       ja: "条件に合うケースが見つかりませんでした。条件を変えてもう一度お試しください。",
@@ -184,9 +188,21 @@ export const diagnoseCopy = {
       en: "Retake the quiz",
       ja: "もう一度診断する",
     } satisfies BilingualCopy,
+    editAnswers: {
+      en: "Edit answers",
+      ja: "回答を修正する",
+    } satisfies BilingualCopy,
     viewPhone: {
-      en: "View this phone’s cases",
-      ja: "この端末のケース一覧へ",
+      en: "Compare cases for this phone",
+      ja: "この端末のケースを比較する",
+    } satisfies BilingualCopy,
+    compareTop: (n: number): BilingualCopy => ({
+      en: `Compare top ${n}`,
+      ja: `上位${n}件を比較する`,
+    }),
+    viewPhonePage: {
+      en: "Go to this phone’s page",
+      ja: "この端末のページへ",
     } satisfies BilingualCopy,
     score: (rank: number, score: number): BilingualCopy => ({
       en: `#${rank} · Score ${score}`,
@@ -199,8 +215,18 @@ export const diagnoseCopy = {
       ja: "この商品が合う理由",
     } satisfies BilingualCopy,
     buyLink: {
-      en: "View product",
+      en: "View purchase options",
       ja: "購入先を見る",
+    } satisfies BilingualCopy,
+  },
+  resume: {
+    banner: {
+      en: "Resumed where you left off",
+      ja: "前回の続きから再開しました",
+    } satisfies BilingualCopy,
+    startOver: {
+      en: "Start over",
+      ja: "最初からやり直す",
     } satisfies BilingualCopy,
   },
   reasons: {

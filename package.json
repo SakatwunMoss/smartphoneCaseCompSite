@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test:diagnose": "tsx src/lib/diagnose/scoring.test.ts",
+    "test:diagnose": "tsx src/lib/diagnose/scoring.test.ts && tsx src/lib/diagnose/persist.test.ts && tsx src/lib/diagnose/purchaseUrl.test.ts && tsx src/lib/compare-query.test.ts",
     "fetch-images": "tsx --env-file=.env.local scripts/fetch-og-images.ts",
     "preview-images": "tsx --env-file=.env.local scripts/preview-og-images.ts",
     "apply-images": "tsx --env-file=.env.local scripts/apply-og-images.ts",

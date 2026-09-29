@@ -1,20 +1,30 @@
 "use client";
 
-import { useCallback, useMemo, useState, useTransition } from "react";
+import {
+  useCallback,
+  useMemo,
+  useState,
+  useTransition,
+} from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
-import { CaseListWithCompare } from "@/components/CaseListWithCompare";
 import { AffiliateBadge } from "@/components/AffiliateBadge";
+import { CaseListWithCompare } from "@/components/CaseListWithCompare";
 import {
   CompareSelectionBar,
   CompareTable,
 } from "@/components/ProductCompare";
 import { ProductImage } from "@/components/ProductImage";
+import { AFFILIATE_LINK_REL } from "@/lib/affiliate";
 import {
   MAX_COMPARE_SELECTION,
   offerToComparable,
   type ComparableItem,
 } from "@/lib/comparable";
+import {
+  buildInitialCompareSelection,
+  parseCompareQuery,
+} from "@/lib/compare-query";
 import type { Case, MarketplaceOffer } from "@/types/database";
 
 // "other" = cases テーブル由来（旧 yodobashi）。複数ショップが混在するため表示名は「その他」。
@@ -25,6 +35,10 @@ type CaseSourceTabsProps = {
   otherCases: Case[];
   rakutenOffers: MarketplaceOffer[];
   yahooOffers: MarketplaceOffer[];
+};
+
+type CaseSourceTabsInnerProps = CaseSourceTabsProps & {
+  initialSelectedIds: string[];
 };
 
 const TABS: { id: CaseSource; label: string }[] = [
@@ -198,7 +212,7 @@ function MarketplaceOfferList({
                 <a
                   href={offer.url}
                   target="_blank"
-                  rel="noopener noreferrer"
+                  rel={AFFILIATE_LINK_REL}
                   onClick={(e) => e.stopPropagation()}
                   className="inline-flex items-center gap-1 text-sm font-medium text-orange-500 underline-offset-2 transition-colors hover:text-orange-600 hover:underline"
                 >
@@ -214,26 +228,52 @@ function MarketplaceOfferList({
   );
 }
 
-export function CaseSourceTabs({
+function CaseSourceTabsInner({
   otherCases,
   rakutenOffers,
   yahooOffers,
-}: CaseSourceTabsProps) {
+  initialSelectedIds,
+}: CaseSourceTabsInnerProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
 
-  // タブ横断で比較選択を保持（ComparableItem 本体を Map に保持）
   const [selectedMap, setSelectedMap] = useState<Map<string, ComparableItem>>(
-    () => new Map(),
+    () =>
+      buildInitialCompareSelection(
+        initialSelectedIds,
+        otherCases,
+        rakutenOffers,
+        yahooOffers,
+      ).map,
   );
-  const [showCompare, setShowCompare] = useState(false);
+  const [showCompare, setShowCompare] = useState(() => {
+    const { map } = buildInitialCompareSelection(
+      initialSelectedIds,
+      otherCases,
+      rakutenOffers,
+      yahooOffers,
+    );
+    return map.size >= 2;
+  });
+  /** 比較クエリ由来の初期タブ。ユーザーがタブを切り替えたら null にして URL に委ねる */
+  const [sourceOverride, setSourceOverride] = useState<CaseSource | null>(
+    () =>
+      buildInitialCompareSelection(
+        initialSelectedIds,
+        otherCases,
+        rakutenOffers,
+        yahooOffers,
+      ).preferredSource,
+  );
 
-  const activeSource = useMemo(
-    () => parseSource(searchParams.get("source")),
-    [searchParams],
-  );
+  const activeSource = useMemo(() => {
+    if (sourceOverride) {
+      return sourceOverride;
+    }
+    return parseSource(searchParams.get("source"));
+  }, [searchParams, sourceOverride]);
 
   const selectedIds = useMemo(
     () => new Set(selectedMap.keys()),
@@ -279,6 +319,7 @@ export function CaseSourceTabs({
 
   const setSource = useCallback(
     (source: CaseSource) => {
+      setSourceOverride(null);
       const params = new URLSearchParams(searchParams.toString());
       // 楽天がデフォルトのためクエリは付けない
       if (source === "rakuten") {
@@ -375,5 +416,18 @@ export function CaseSourceTabs({
         onCompare={handleCompare}
       />
     </div>
+  );
+}
+
+/**
+ * searchParams は Client の useSearchParams で読む（ページ全体の動的化を避ける）。
+ * 親の Suspense 境界必須。
+ */
+export function CaseSourceTabs(props: CaseSourceTabsProps) {
+  const searchParams = useSearchParams();
+  const initialSelectedIds = parseCompareQuery(searchParams.get("compare"));
+
+  return (
+    <CaseSourceTabsInner {...props} initialSelectedIds={initialSelectedIds} />
   );
 }

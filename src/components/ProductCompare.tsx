@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
 import { AffiliateBadge } from "@/components/AffiliateBadge";
+import { AFFILIATE_LINK_REL } from "@/lib/affiliate";
 import type { ComparableItem } from "@/lib/comparable";
 
 function formatPrice(price: number): string {
@@ -254,7 +255,7 @@ export function CompareTable({ items, onClear }: CompareTableProps) {
                       <a
                         href={item.url}
                         target="_blank"
-                        rel="noopener noreferrer"
+                        rel={AFFILIATE_LINK_REL}
                         className="inline-block font-medium text-orange-500 underline-offset-2 transition-colors hover:text-orange-600 hover:underline"
                       >
                         購入先を見る →

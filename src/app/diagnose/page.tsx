@@ -4,8 +4,8 @@ import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { DiagnoseQuiz } from "@/components/diagnose/DiagnoseQuiz";
 import { getAllCatalogPhones } from "@/lib/catalog";
 import { diagnoseCopy } from "@/lib/diagnose/copy";
+import { buildDiagnoseCases } from "@/lib/diagnose/purchaseUrl";
 import { buildPageMetadata } from "@/lib/metadata";
-import type { Case } from "@/types/database";
 
 const { meta } = diagnoseCopy;
 
@@ -22,7 +22,8 @@ export default function DiagnosePage() {
     name: phone.name,
     maker: phone.maker,
   }));
-  const cases: Case[] = catalogPhones.flatMap((phone) => phone.cases);
+  // 購入導線は楽天/Yahoo を優先（marketplace_offers を主カタログにする）
+  const cases = buildDiagnoseCases(catalogPhones);
 
   return (
     <div className="flex flex-1 flex-col px-6 py-10">

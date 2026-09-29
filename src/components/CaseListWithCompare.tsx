@@ -2,6 +2,7 @@
 
 import { AffiliateBadge } from "@/components/AffiliateBadge";
 import { ProductImage } from "@/components/ProductImage";
+import { AFFILIATE_LINK_REL } from "@/lib/affiliate";
 import { caseToComparable, type ComparableItem } from "@/lib/comparable";
 import type { Case } from "@/types/database";
 
@@ -81,7 +82,7 @@ export function CaseListWithCompare({
                 <a
                   href={caseItem.url}
                   target="_blank"
-                  rel="noopener noreferrer"
+                  rel={AFFILIATE_LINK_REL}
                   onClick={(e) => e.stopPropagation()}
                   className="inline-block text-sm font-medium text-orange-500 underline-offset-2 transition-colors hover:text-orange-600 hover:underline"
                 >
