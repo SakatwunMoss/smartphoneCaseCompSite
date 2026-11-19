@@ -6,7 +6,7 @@ import { columns } from "@/lib/columns";
 import { buildPageMetadata } from "@/lib/metadata";
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "コラム | Phone Case Compare",
+  title: "コラム",
   description: "スマホケース選びに関するコラム記事一覧",
   path: "/columns",
 });

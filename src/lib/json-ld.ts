@@ -1,4 +1,5 @@
-import { SITE_URL } from "@/lib/metadata";
+import type { Column } from "@/lib/columns";
+import { SITE_NAME, SITE_URL } from "@/lib/metadata";
 import type { Case, MarketplaceOffer, Phone } from "@/types/database";
 
 export type JsonLd = Record<string, unknown>;
@@ -166,5 +167,55 @@ export function buildPhonesItemListJsonLd(
       name: phone.name,
       url: absoluteUrl(`/phones/${phone.id}`),
     })),
+  };
+}
+
+/** 機種ページ用 FAQPage */
+export function buildFaqPageJsonLd(
+  faqs: { question: string; answer: string }[],
+): JsonLd | null {
+  if (faqs.length === 0) {
+    return null;
+  }
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqs.map((faq) => ({
+      "@type": "Question",
+      name: faq.question,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: faq.answer,
+      },
+    })),
+  };
+}
+
+/** コラム詳細用 BlogPosting（Article） */
+export function buildArticleJsonLd(column: Column): JsonLd {
+  const url = absoluteUrl(`/columns/${column.slug}`);
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: column.title,
+    description: column.excerpt,
+    datePublished: column.publishedAt,
+    dateModified: column.updatedAt,
+    author: {
+      "@type": "Person",
+      name: column.author,
+    },
+    publisher: {
+      "@type": "Organization",
+      name: SITE_NAME,
+      url: SITE_URL,
+    },
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": url,
+    },
+    url,
   };
 }

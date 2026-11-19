@@ -26,11 +26,18 @@ const ADSENSE_CLIENT = "ca-pub-7938835154204291";
 export const metadata: Metadata = {
   // 相対パスの OG / Twitter 画像などを絶対 URL に解決する
   metadataBase: new URL("https://smartphone-case-comp-site.vercel.app"),
-  title: "Phone Case Compare",
-  description: "スマホケースを比較するサイト",
+  title: {
+    default:
+      "スマホケース比較｜機種別に楽天・Yahoo!の対応ケースを探せる | Phone Case Compare",
+    template: "%s | Phone Case Compare",
+  },
+  description:
+    "iPhone 17/18、Pixel、Galaxy、AQUOSなど対応機種別に、楽天市場・Yahoo!ショッピングのスマホケースを価格比較。好み診断であなたに合うケースも探せます。",
   openGraph: {
-    title: "Phone Case Compare",
-    description: "スマホケースを比較するサイト",
+    title:
+      "スマホケース比較｜機種別に楽天・Yahoo!の対応ケースを探せる | Phone Case Compare",
+    description:
+      "iPhone 17/18、Pixel、Galaxy、AQUOSなど対応機種別に、楽天市場・Yahoo!ショッピングのスマホケースを価格比較。好み診断であなたに合うケースも探せます。",
     url: "https://smartphone-case-comp-site.vercel.app",
     siteName: "Phone Case Compare",
     images: [
@@ -46,8 +53,10 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Phone Case Compare",
-    description: "スマホケースを比較するサイト",
+    title:
+      "スマホケース比較｜機種別に楽天・Yahoo!の対応ケースを探せる | Phone Case Compare",
+    description:
+      "iPhone 17/18、Pixel、Galaxy、AQUOSなど対応機種別に、楽天市場・Yahoo!ショッピングのスマホケースを価格比較。好み診断であなたに合うケースも探せます。",
     images: ["/images/og-image.png"],
   },
   icons: {
@@ -74,7 +83,7 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
-      lang="en"
+      lang="ja"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-white text-gray-900">

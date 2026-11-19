@@ -19,14 +19,14 @@ export async function generateMetadata({
   // title/description はキーワードで変えるが、canonical は常にクエリなし
   if (!keyword) {
     return buildPageMetadata({
-      title: "検索 | Phone Case Compare",
+      title: "検索",
       description: "端末名・ケース名でスマホケースを検索",
       path: "/search",
     });
   }
 
   return buildPageMetadata({
-    title: `「${keyword}」の検索結果 | Phone Case Compare`,
+    title: `「${keyword}」の検索結果`,
     description: `「${keyword}」に一致する端末・ケースの検索結果`,
     path: "/search",
   });

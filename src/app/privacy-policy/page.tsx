@@ -4,7 +4,7 @@ import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { buildPageMetadata } from "@/lib/metadata";
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "プライバシーポリシー | Phone Case Compare",
+  title: "プライバシーポリシー",
   description: "Phone Case Compareのプライバシーポリシー",
   path: "/privacy-policy",
 });

@@ -5,7 +5,7 @@ import { buildPageMetadata } from "@/lib/metadata";
 import { ContactForm } from "./ContactForm";
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "お問い合わせ | Phone Case Compare",
+  title: "お問い合わせ",
   description: "Phone Case Compareへのお問い合わせ",
   path: "/contact",
 });

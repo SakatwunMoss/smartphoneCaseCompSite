@@ -17,7 +17,11 @@ import { columns } from "@/lib/columns";
 import { getPhoneFilterOptions, getPhones } from "@/lib/catalog";
 import { diagnoseCopy } from "@/lib/diagnose/copy";
 import { buildPhonesItemListJsonLd } from "@/lib/json-ld";
-import { buildPageMetadata } from "@/lib/metadata";
+import {
+  HOME_DESCRIPTION,
+  HOME_TITLE,
+  buildPageMetadata,
+} from "@/lib/metadata";
 import { parsePhoneFilters } from "@/lib/phone-filters";
 
 const featuredColumns = columns.slice(0, 3);
@@ -30,9 +34,10 @@ type HomeProps = {
 /** 絞り込み・並び替えのクエリがあっても canonical は常にベース URL */
 export async function generateMetadata(): Promise<Metadata> {
   return buildPageMetadata({
-    title: "Phone Case Compare",
-    description: "スマホケースを比較するサイト",
+    title: HOME_TITLE,
+    description: HOME_DESCRIPTION,
     path: "/",
+    absoluteTitle: true,
   });
 }
 

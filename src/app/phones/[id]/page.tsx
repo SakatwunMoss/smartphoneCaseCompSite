@@ -1,23 +1,44 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
 import { notFound } from "next/navigation";
 
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { CaseSourceTabs } from "@/components/CaseSourceTabs";
 import { JsonLd } from "@/components/JsonLd";
 import { PhoneDescription } from "@/components/PhoneDescription";
+import { PhoneFaqSection } from "@/components/PhoneFaqSection";
+import { PhoneRelatedColumns } from "@/components/PhoneRelatedColumns";
 import {
   getMarketplaceOffers,
   getOtherCases,
   getPhone,
   getStaticPhoneParams,
 } from "@/lib/catalog";
-import { buildPhoneCasesItemListJsonLd } from "@/lib/json-ld";
+import { parseCaseSource } from "@/lib/case-source";
+import { parseCompareQuery } from "@/lib/compare-query";
+import {
+  buildFaqPageJsonLd,
+  buildPhoneCasesItemListJsonLd,
+} from "@/lib/json-ld";
 import { buildPageMetadata } from "@/lib/metadata";
+import {
+  getPhonePageContent,
+  getPublishableFaqs,
+  mergePhoneDescription,
+} from "@/lib/phone-page-content";
 
 type PageProps = {
   params: Promise<{ id: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
+
+function firstQuery(
+  value: string | string[] | undefined,
+): string | null {
+  if (Array.isArray(value)) {
+    return value[0] ?? null;
+  }
+  return value ?? null;
+}
 
 export function generateStaticParams() {
   return getStaticPhoneParams();
@@ -31,36 +52,26 @@ export async function generateMetadata({
 
   if (!phone) {
     return buildPageMetadata({
-      title: "機種が見つかりません | Phone Case Compare",
+      title: "機種が見つかりません",
       description: "指定された機種は見つかりませんでした。",
     });
   }
 
+  const pageContent = getPhonePageContent(id);
+
   return buildPageMetadata({
-    title: `${phone.name}対応ケースまとめ | Phone Case Compare`,
-    description: `${phone.name}に対応するスマホケースを比較。耐衝撃・手帳型などタイプ別に厳選したおすすめケースを紹介します。`,
+    title: pageContent?.seoTitle ?? `${phone.name}対応ケースまとめ`,
+    description:
+      pageContent?.seoDescription ??
+      `${phone.name}に対応するスマホケースを比較。耐衝撃・手帳型などタイプ別に厳選したおすすめケースを紹介します。`,
     path: `/phones/${id}`,
   });
 }
 
-function CaseSourceTabsFallback() {
-  return (
-    <div className="animate-pulse space-y-4">
-      <div className="flex gap-2 border-b border-gray-200 pb-2">
-        <div className="h-9 w-28 rounded bg-gray-100" />
-        <div className="h-9 w-32 rounded bg-gray-100" />
-        <div className="h-9 w-40 rounded bg-gray-100" />
-      </div>
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <div className="h-56 rounded-xl bg-gray-100" />
-        <div className="h-56 rounded-xl bg-gray-100" />
-        <div className="h-56 rounded-xl bg-gray-100" />
-      </div>
-    </div>
-  );
-}
-
-export default async function PhoneDetailPage({ params }: PageProps) {
+export default async function PhoneDetailPage({
+  params,
+  searchParams,
+}: PageProps) {
   const { id } = await params;
   const phone = getPhone(id);
 
@@ -68,20 +79,47 @@ export default async function PhoneDetailPage({ params }: PageProps) {
     notFound();
   }
 
+  const pageContent = getPhonePageContent(id);
+  const query = await searchParams;
+  const compareRaw = firstQuery(query.compare);
+  const requestedSource = parseCaseSource(firstQuery(query.source));
+  const initialSelectedIds = parseCompareQuery(compareRaw);
+  const initialCompareQuery =
+    compareRaw && compareRaw.trim() !== "" ? compareRaw.trim() : null;
+
   const otherCases = getOtherCases(id);
   const rakutenOffers = getMarketplaceOffers(id, "rakuten");
   const yahooOffers = getMarketplaceOffers(id, "yahoo");
+
+  // 空の「その他」を初期タブにしない
+  const initialSource =
+    requestedSource === "other" && otherCases.length === 0
+      ? "rakuten"
+      : requestedSource;
+
+  const mergedDescription = mergePhoneDescription(
+    phone.description,
+    pageContent?.extraDescriptionSections,
+  );
 
   const casesItemListJsonLd = buildPhoneCasesItemListJsonLd(
     phone,
     otherCases,
     [...rakutenOffers, ...yahooOffers],
   );
+  const faqPageJsonLd = buildFaqPageJsonLd(
+    getPublishableFaqs(pageContent?.faqs),
+  );
+
+  const jsonLdPayloads = [
+    casesItemListJsonLd,
+    ...(faqPageJsonLd ? [faqPageJsonLd] : []),
+  ];
 
   return (
     <div className="flex flex-1 flex-col px-6 py-10">
       <main className="mx-auto w-full max-w-6xl">
-        <JsonLd data={casesItemListJsonLd} />
+        <JsonLd data={jsonLdPayloads} />
         <Breadcrumbs
           items={[
             { label: "ホーム", href: "/" },
@@ -107,8 +145,8 @@ export default async function PhoneDetailPage({ params }: PageProps) {
           </dl>
         </header>
 
-        {phone.description?.trim() ? (
-          <PhoneDescription description={phone.description} />
+        {mergedDescription ? (
+          <PhoneDescription description={mergedDescription} />
         ) : null}
 
         <section>
@@ -117,14 +155,23 @@ export default async function PhoneDetailPage({ params }: PageProps) {
             ※表示価格は変動する場合があります。購入の際は各販売元の最新価格をご確認ください。
           </p>
 
-          <Suspense fallback={<CaseSourceTabsFallback />}>
-            <CaseSourceTabs
-              otherCases={otherCases}
-              rakutenOffers={rakutenOffers}
-              yahooOffers={yahooOffers}
-            />
-          </Suspense>
+          <CaseSourceTabs
+            otherCases={otherCases}
+            rakutenOffers={rakutenOffers}
+            yahooOffers={yahooOffers}
+            initialSource={initialSource}
+            initialSelectedIds={initialSelectedIds}
+            initialCompareQuery={initialCompareQuery}
+          />
         </section>
+
+        {pageContent?.faqs?.length ? (
+          <PhoneFaqSection faqs={pageContent.faqs} />
+        ) : null}
+
+        {pageContent?.relatedColumnSlugs?.length ? (
+          <PhoneRelatedColumns columnSlugs={pageContent.relatedColumnSlugs} />
+        ) : null}
       </main>
     </div>
   );

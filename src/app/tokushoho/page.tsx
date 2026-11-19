@@ -5,7 +5,7 @@ import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { buildPageMetadata } from "@/lib/metadata";
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "特定商取引法に基づく表記 | Phone Case Compare",
+  title: "特定商取引法に基づく表記",
   description: "Phone Case Compareの特定商取引法に基づく表記",
   path: "/tokushoho",
 });

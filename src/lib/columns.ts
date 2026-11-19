@@ -1,11 +1,57 @@
-export type Column = {
+type ColumnContent = {
   slug: string;
   title: string;
   excerpt: string;
   body: string[];
 };
 
-export const columns: Column[] = [
+export type Column = ColumnContent & {
+  publishedAt: string;
+  updatedAt: string;
+  author: string;
+  relatedPhoneIds: string[];
+};
+
+/** TODO: 実著者名に差し替え */
+const PLACEHOLDER_AUTHOR = "Phone Case Compare 編集部";
+
+const DEFAULT_RELATED_PHONE_IDS = [
+  "42334cc6-9bde-445d-859e-f4f81299e62a", // iPhone 17
+  "c587c9e5-09c0-40b9-94d5-ad6d08ad86f4", // Google Pixel 10
+  "90d675de-2d48-4512-a194-968773af7bd5", // Galaxy S26
+];
+
+/** slug ごとの関連機種（未指定時は DEFAULT を使用） */
+const RELATED_PHONE_IDS_BY_SLUG: Record<string, string[]> = {
+  "trend-phones-case-availability-2025-2026": [
+    "42334cc6-9bde-445d-859e-f4f81299e62a", // iPhone 17
+    "8e7f15b1-2d83-4202-9ef8-f33d0b2bdc4c", // iPhone 17 Pro
+    "c587c9e5-09c0-40b9-94d5-ad6d08ad86f4", // Pixel 10
+    "8a383641-5390-4311-85c3-831c78213022", // Pixel 11
+    "90d675de-2d48-4512-a194-968773af7bd5", // Galaxy S26
+    "faef03a8-2c2e-4f61-8e2a-00cd9b1bb447", // AQUOS sense10
+  ],
+  "foldable-phone-case-guide": [
+    "90d675de-2d48-4512-a194-968773af7bd5", // Galaxy S26（折りたたみ周辺）
+    "c587c9e5-09c0-40b9-94d5-ad6d08ad86f4",
+  ],
+  "magsafe-necessity": [
+    "42334cc6-9bde-445d-859e-f4f81299e62a",
+    "8e7f15b1-2d83-4202-9ef8-f33d0b2bdc4c",
+    "c587c9e5-09c0-40b9-94d5-ad6d08ad86f4",
+  ],
+  "iphone-duo-case-compatibility": [
+    "9533d6c0-2284-4b2b-a223-504a901460b5", // iPhone Duo
+    "42334cc6-9bde-445d-859e-f4f81299e62a", // iPhone 17
+    "8e7f15b1-2d83-4202-9ef8-f33d0b2bdc4c", // iPhone 17 Pro
+  ],
+  "iphone-duo-apple-pencil-case": [
+    "9533d6c0-2284-4b2b-a223-504a901460b5", // iPhone Duo
+    "42334cc6-9bde-445d-859e-f4f81299e62a",
+  ],
+};
+
+const columnContents: ColumnContent[] = [
   {
     slug: "case-type-comparison",
     title: "耐衝撃ケース vs 手帳型ケース、どっちを選ぶべき？",
@@ -246,7 +292,66 @@ export const columns: Column[] = [
       "以上を確認したうえで、当サイトの機種ページから対応ケースを検索すれば、型番間違いによる買い直しを減らせます。中古端末こそ、最初にケースとフィルムをセットで揃えておくと、本体の状態を長く保てます。",
     ],
   },
+  {
+    slug: "iphone-duo-case-compatibility",
+    title: "iPhone 17などのケースはiPhone Duoに使える？互換性の考え方",
+    excerpt:
+      "折りたたみのiPhone Duoと通常のiPhone用ケースは寸法が合わず流用できません。公式スペックで理由を整理します。",
+    body: [
+      "結論から言うと、iPhone 17用ケースはiPhone Duoに使えません。Duo以外のすべてのiPhone用ケースも非対応です。折りたたみ構造と通常のスラブ型では外形が根本から違うため、「画面サイズが近い」だけでは判断できません。",
+      "機種ページの対応ケース一覧もあわせて確認してください。→ [iPhone Duoの対応ケースを見る](/phones/9533d6c0-2284-4b2b-a223-504a901460b5)",
+      "### 公式スペックで見る外形・厚みの違い",
+      "Apple公式「iPhone Duo の技術仕様」（https://support.apple.com/ja-jp/148588）によると、Duoは開いた時が幅164.6×高さ117.8×厚さ5.2mm、閉じた時が幅84.1×高さ117.8×厚さ11.3mm、重量254gです。一方、Apple公式の技術仕様におけるiPhone 17は幅71.5×高さ149.6×厚さ7.95mmです。",
+      "閉じた状態のDuoとiPhone 17を比べると、高さは約32mm低く（117.8mm vs 149.6mm）、幅は約13mm広く（84.1mm vs 71.5mm）、厚さは約1.4倍（11.3mm vs 7.95mm）です。形状がまったく異なるため、17用ケースをDuoに被せることはできません。",
+      "### カメラ・ボタン（本体仕様）",
+      "Duo本体の背面カメラは48MPメイン / 12MP 2倍望遠 / 48MP超広角、操作系は音量ボタン・カメラコントロール・Touch ID内蔵のサイドボタンです（出典: Apple公式「iPhone Duo の技術仕様」https://support.apple.com/ja-jp/148588）。カメラの配置・形状が各社ケースの穴とどう一致するかは製品ごとに異なるため、メーカーの対応表記を確認してください。",
+      "### iPhone 17用ケースは使えるか",
+      "使えません。上記の寸法差に加え、Duoは開閉する折りたたみ機です。Duo以外の全iPhone用ケースも同様に非対応と考え、Duo専用品を選んでください。",
+      "### Duo専用ケースを選ぶときのポイント",
+      "次を基準にすると失敗しにくいです。(1) iPhone Duo専用品であること。(2) 閉じた状態・開いた状態の両方で画面とヒンジを守れるか（各社のヒンジ保護方式の詳細はメーカー表記を確認）。(3) MagSafe / Qi2（最大25Wワイヤレス充電）対応か（出典: 同上・Apple公式技術仕様）。(4) Apple Pencil (USB-C) を使うなら画面の縁が高すぎないか。(5) サイドボタン（Touch ID）を指で押しやすいか。純正には表裏を包む2ピースの「iPhone Duo Case」（磁石装着）や「Folio with Kickstand」があります。",
+      "候補は機種ページの楽天・Yahoo!一覧から比較できます。→ [iPhone Duo対応ケース](/phones/9533d6c0-2284-4b2b-a223-504a901460b5)",
+    ],
+  },
+  {
+    slug: "iphone-duo-apple-pencil-case",
+    title: "Apple Pencilと使えるiPhone Duoケースの選び方",
+    excerpt:
+      "iPhone Duoで使えるのはApple Pencil (USB-C) のみ。iOS 27.2以降の前提で、ケース選びのポイントを整理します。",
+    body: [
+      "iPhone Duoで手書きや注釈を使う場合、まず「どのPencilが使えるか」を押さえたうえで、ケースの縁やボタン周りを確認するのが安全です。",
+      "ケース候補の比較はこちら。→ [iPhone Duoの対応ケースを見る](/phones/9533d6c0-2284-4b2b-a223-504a901460b5)",
+      "### Apple Pencilの対応状況",
+      "対応するのは Apple Pencil (USB-C) だけです。Apple Pencil Pro・第1世代・第2世代は非対応です。対応は iOS 27.2 以降で、内側・外側の両方の画面で使えます。筆圧感知・ダブルタップ・スクイーズは、USB-Cモデルの仕様として非対応です。出典はApple公式「iPhone Duo の技術仕様」（https://support.apple.com/ja-jp/148588）です。公式ページの注記が古い場合があるため、本稿では対応OSを「iOS 27.2以降」と明記します。",
+      "### ケース装着時に起きやすい干渉",
+      "画面の縁が高すぎると、ペン先がディスプレイに届きにくくなることがあります。Pencilを本体側面に磁石でくっつけられるか、またその装着にケースが干渉するか、ホバーに対応しているかについては断定せず、メーカーの対応表記を確認してください。",
+      "### 選ぶときに見るポイント",
+      "(1) Duo専用品であること。(2) 開閉の両方で画面とヒンジを守れるか。(3) MagSafe / Qi2（最大25W）対応か（出典: Apple公式技術仕様 https://support.apple.com/ja-jp/148588）。(4) Pencil併用なら縁が高すぎないか。(5) サイドボタン（Touch ID）の押しやすさ。純正の「iPhone Duo Case」「Folio with Kickstand」も選択肢です。各社のヒンジ保護方式はメーカー表記を確認してください。",
+      "### まとめ",
+      "Duoで使えるPencilはUSB-Cモデルのみ（iOS 27.2以降・両面対応）。ケースはDuo専用を前提に、MagSafe/Qi2・縁の高さ・Touch IDボタンの押しやすさを見て選ぶとよいでしょう（寸法・充電・Pencil対応の出典: Apple公式 https://support.apple.com/ja-jp/148588）。",
+      "実際の商品は機種ページから比較できます。→ [iPhone Duo対応ケース](/phones/9533d6c0-2284-4b2b-a223-504a901460b5)",
+    ],
+  },
 ];
+
+/**
+ * TODO: publishedAt / updatedAt / author / relatedPhoneIds は仮値。
+ * 公開運用時は記事ごとに実日付・実著者・関連機種へ差し替えること。
+ */
+export const columns: Column[] = columnContents.map((content, index) => {
+  const month = String((index % 12) + 1).padStart(2, "0");
+  const day = String((index % 27) + 1).padStart(2, "0");
+  const publishedAt = `2025-${month}-${day}`;
+  const updatedAt = `2026-03-${day}`;
+
+  return {
+    ...content,
+    author: PLACEHOLDER_AUTHOR,
+    publishedAt,
+    updatedAt,
+    relatedPhoneIds:
+      RELATED_PHONE_IDS_BY_SLUG[content.slug] ?? DEFAULT_RELATED_PHONE_IDS,
+  };
+});
 
 export function getColumnBySlug(slug: string): Column | undefined {
   return columns.find((column) => column.slug === slug);

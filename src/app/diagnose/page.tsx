@@ -10,7 +10,7 @@ import { buildPageMetadata } from "@/lib/metadata";
 const { meta } = diagnoseCopy;
 
 export const metadata: Metadata = buildPageMetadata({
-  title: `${meta.title.en} / ${meta.title.ja} | Phone Case Compare`,
+  title: `${meta.title.en} / ${meta.title.ja}`,
   description: `${meta.description.ja} ${meta.description.en}`,
   path: "/diagnose",
 });
