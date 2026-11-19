@@ -85,6 +85,10 @@ export function getPhones(filters: PhoneFilters): {
     phones = phones.filter((phone) => phone.released_year === year);
   }
 
+  if (filters.foldableOnly) {
+    phones = phones.filter((phone) => phone.is_foldable === true);
+  }
+
   switch (filters.sort) {
     case "year_asc":
       phones = [...phones].sort(

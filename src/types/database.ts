@@ -6,6 +6,8 @@ export type Phone = {
   image_url?: string | null;
   /** 機種ページ用解説文。### 見出しでセクション分割可能 */
   description?: string | null;
+  /** 折りたたみ機種フラグ（一覧の「折りたたみ」絞り込み用） */
+  is_foldable?: boolean;
 };
 
 export type Case = {

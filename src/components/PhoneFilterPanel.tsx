@@ -58,6 +58,13 @@ export function PhoneFilterPanel({
     applyFilters({ ...currentFilters, sort });
   };
 
+  const toggleFoldableOnly = () => {
+    applyFilters({
+      ...currentFilters,
+      foldableOnly: !currentFilters.foldableOnly,
+    });
+  };
+
   const resetFilters = () => {
     applyFilters(initialFilters);
   };
@@ -65,6 +72,7 @@ export function PhoneFilterPanel({
   const hasActiveFilters =
     currentFilters.makers.length > 0 ||
     currentFilters.year !== "" ||
+    currentFilters.foldableOnly ||
     currentFilters.sort !== "year_desc";
 
   const filterControls = (
@@ -88,6 +96,21 @@ export function PhoneFilterPanel({
             </li>
           ))}
         </ul>
+      </fieldset>
+
+      <fieldset>
+        <legend className="mb-2 text-sm font-medium text-gray-700">
+          形状
+        </legend>
+        <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 transition-colors hover:border-orange-300 sm:max-w-xs">
+          <input
+            type="checkbox"
+            checked={currentFilters.foldableOnly}
+            onChange={toggleFoldableOnly}
+            className="accent-orange-500"
+          />
+          <span>折りたたみ</span>
+        </label>
       </fieldset>
 
       <div className="grid gap-4 sm:grid-cols-2">

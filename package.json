@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "test:diagnose": "tsx src/lib/diagnose/scoring.test.ts && tsx src/lib/diagnose/persist.test.ts && tsx src/lib/diagnose/purchaseUrl.test.ts && tsx src/lib/compare-query.test.ts",
+    "test:matcher": "tsx scripts/sync-offers/matcher.test.ts",
     "fetch-images": "tsx --env-file=.env.local scripts/fetch-og-images.ts",
     "preview-images": "tsx --env-file=.env.local scripts/preview-og-images.ts",
     "apply-images": "tsx --env-file=.env.local scripts/apply-og-images.ts",
@@ -15,6 +16,7 @@
     "test:yahoo": "tsx --env-file=.env.local scripts/api-test/yahoo-test.ts",
     "sync:offers": "tsx --env-file=.env.local scripts/sync-offers/run.ts",
     "sync:offers:ci": "tsx scripts/sync-offers/run.ts",
+    "cleanup:offers": "tsx scripts/sync-offers/cleanup-mismatched-offers.ts",
     "export:catalog": "node scripts/export-catalog-json.mjs",
     "generate:favicons": "tsx scripts/generate-favicons.ts"
   },

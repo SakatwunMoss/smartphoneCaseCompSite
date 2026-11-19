@@ -68,6 +68,19 @@ function parsePhoneFilter(argv: string[]): string | null {
   return null;
 }
 
+/**
+ * 楽天APIは単独の1文字トークン（例: Galaxy Z Fold8 の "Z"）を含む
+ * keyword を HTTP 400 (keyword is not valid) にする。
+ * 検索用には1文字トークンを除き、一致判定は従来どおり phone.name を使う。
+ */
+function buildSearchKeyword(phoneName: string): string {
+  const cleaned = phoneName
+    .split(/[\s\u3000]+/)
+    .filter((token) => token.length > 1)
+    .join(" ");
+  return `${cleaned || phoneName} ケース`;
+}
+
 async function main() {
   // 起動時に必須環境変数を検証（楽天 accessKey も新APIでは必須）
   const supabaseUrl = requireEnv("NEXT_PUBLIC_SUPABASE_URL");
@@ -111,7 +124,10 @@ async function main() {
 
   for (let i = 0; i < phones.length; i++) {
     const phone = phones[i] as PhoneRow;
-    const keyword = `${phone.name} ケース`;
+    const keyword = buildSearchKeyword(phone.name);
+    if (keyword !== `${phone.name} ケース`) {
+      console.log(`${phone.name}: 検索キーワード "${keyword}"`);
+    }
 
     try {
       // レート制限回避のため楽天→Yahoo を直列実行（片方失敗しても他方は保存）
@@ -184,6 +200,33 @@ async function main() {
         if (upsertError) {
           throw new Error(`upsert失敗: ${upsertError.message}`);
         }
+      }
+
+      // 既存行のうち新 matcher で不一致のものを削除（upsert だけでは残るため）
+      const { data: existingOffers, error: existingError } = await supabase
+        .from("marketplace_offers")
+        .select("id, name")
+        .eq("phone_id", phone.id);
+
+      if (existingError) {
+        throw new Error(`既存offers取得失敗: ${existingError.message}`);
+      }
+
+      const staleIds = (existingOffers ?? [])
+        .filter((row) => !isMatchingPhoneModel(phone.name, row.name))
+        .map((row) => row.id);
+
+      if (staleIds.length > 0) {
+        const { error: deleteError } = await supabase
+          .from("marketplace_offers")
+          .delete()
+          .in("id", staleIds);
+        if (deleteError) {
+          throw new Error(`不一致offers削除失敗: ${deleteError.message}`);
+        }
+        console.log(
+          `${phone.name}: 既存${staleIds.length}件を機種名不一致で削除`,
+        );
       }
 
       if (rakutenFailed && yahooFailed) {

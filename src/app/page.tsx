@@ -92,7 +92,12 @@ export default async function Home({ searchParams }: HomeProps) {
             <PhoneFilterPanel
               makers={makers}
               years={years}
-              initialFilters={{ makers: [], year: "", sort: "year_desc" }}
+              initialFilters={{
+                makers: [],
+                year: "",
+                foldableOnly: false,
+                sort: "year_desc",
+              }}
             />
           </Suspense>
 
