@@ -39,6 +39,20 @@ import type { Case, Phone } from "@/types/database";
 
 const QUIZ_SCROLL_MARGIN_CLASS = "scroll-mt-20";
 
+/** 選択肢グリッド（スマホ・PCとも2列。奇数個の最後は全幅） */
+const OPTION_GRID_CLASS = "mt-4 grid grid-cols-2 gap-2";
+
+const OPTION_BUTTON_BASE_CLASS =
+  "min-h-11 h-full w-full rounded-xl border px-4 py-3.5 text-left transition-colors odd:last:col-span-2";
+
+function optionButtonClass(selected: boolean): string {
+  return `${OPTION_BUTTON_BASE_CLASS} ${
+    selected
+      ? "border-orange-500 bg-white ring-1 ring-orange-500"
+      : "border-orange-100/80 bg-white/80 hover:border-orange-300"
+  }`;
+}
+
 const { quiz: quizCopy, results: resultsCopy, resume: resumeCopy } =
   diagnoseCopy;
 
@@ -260,7 +274,7 @@ export function DiagnoseQuiz({ phones, cases }: DiagnoseQuizProps) {
         </div>
       </div>
 
-      <div className="rounded-xl border border-orange-100 bg-orange-50/40 p-5 sm:p-6">
+      <div className="rounded-xl border border-orange-100 bg-orange-50/40 p-4 sm:p-6">
         <StepContent
           step={step}
           draft={draft}
@@ -268,7 +282,7 @@ export function DiagnoseQuiz({ phones, cases }: DiagnoseQuizProps) {
           phones={phones}
         />
 
-        <div className="mt-8 flex flex-wrap items-center gap-3">
+        <div className="mt-5 flex flex-wrap items-center gap-3">
           {stepIndex === 0 ? (
             <span
               className="invisible inline-flex min-h-[3rem] items-center justify-center rounded-xl border border-gray-200 px-4 py-2"
@@ -523,7 +537,7 @@ function CaseTypeStep({
         enClassName="font-medium text-gray-900"
         jaClassName="!text-gray-600"
       />
-      <div className="mt-4 flex flex-col gap-2">
+      <div className={OPTION_GRID_CLASS}>
         {CASE_TYPE_OPTIONS.map((option) => {
           const selected = values.includes(option.id);
           return (
@@ -531,11 +545,7 @@ function CaseTypeStep({
               key={option.id}
               type="button"
               onClick={() => toggle(option.id)}
-              className={`rounded-xl border px-4 py-3.5 text-left transition-colors ${
-                selected
-                  ? "border-orange-500 bg-white ring-1 ring-orange-500"
-                  : "border-orange-100/80 bg-white/80 hover:border-orange-300"
-              }`}
+              className={optionButtonClass(selected)}
               aria-pressed={selected}
             >
               <BilingualText
@@ -576,7 +586,7 @@ function ChoiceStep<T extends string>({
         enClassName="font-medium text-gray-900"
         jaClassName="!text-gray-600"
       />
-      <div className="mt-4 flex flex-col gap-2">
+      <div className={OPTION_GRID_CLASS}>
         {options.map((option) => {
           const selected = value === option.id;
           return (
@@ -584,11 +594,7 @@ function ChoiceStep<T extends string>({
               key={option.id}
               type="button"
               onClick={() => onChange(option.id)}
-              className={`rounded-xl border px-4 py-3.5 text-left transition-colors ${
-                selected
-                  ? "border-orange-500 bg-white ring-1 ring-orange-500"
-                  : "border-orange-100/80 bg-white/80 hover:border-orange-300"
-              }`}
+              className={optionButtonClass(selected)}
               aria-pressed={selected}
             >
               <BilingualText
@@ -637,7 +643,7 @@ function MultiChoiceStep<T extends string>({
         enClassName="font-medium text-gray-900"
         jaClassName="!text-gray-600"
       />
-      <div className="mt-4 flex flex-col gap-2">
+      <div className={OPTION_GRID_CLASS}>
         {options.map((option) => {
           const selected = values.includes(option.id);
           return (
@@ -645,11 +651,7 @@ function MultiChoiceStep<T extends string>({
               key={option.id}
               type="button"
               onClick={() => toggle(option.id)}
-              className={`rounded-xl border px-4 py-3.5 text-left transition-colors ${
-                selected
-                  ? "border-orange-500 bg-white ring-1 ring-orange-500"
-                  : "border-orange-100/80 bg-white/80 hover:border-orange-300"
-              }`}
+              className={optionButtonClass(selected)}
               aria-pressed={selected}
             >
               <BilingualText
